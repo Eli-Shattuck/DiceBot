@@ -18,9 +18,10 @@ const alieses = {
 // const flags = [
 //     '-adv',     //roll multiple dice and only return the highest
 //     '-dis',     //roll multiple dice and only return the lowest
-//     '-sort',    //return list of results in sorted order
+//     '-sort',    //return list of results in decreasing order
+//     '-isort',   //return list of results in increasing order
 //     '-hist',    //return histogram of results
-//     '-pick',    //takes argument k, only return higest k rolls
+//     '-pick',    //takes argument k, only return k rolls
 //     '-sum',     //sums all rolls and returns the total
 //     '-loop',    //takes argument k, repeats the command k times
 // ]
@@ -100,13 +101,6 @@ class Flag {
 module.exports = class RollCommand extends Command{
     constructor(){
         super();
-        // this.adv = false;
-        // this.dis = false;
-        // this.sort = false;
-        // this.hist = false;
-        // this.pick = false;
-        // this.sum = false;
-        // this.loop = 1;
     }
 
     static getRollRe(){
@@ -132,6 +126,9 @@ module.exports = class RollCommand extends Command{
         for(let i = 0; i < loopSize; i++) {
             results = this.rollDice(n, x);
             this.doOptions(results, n, x, b, options);
+            for(let j=0; j<results.length; j++){
+                results[i] = results[i] + b;
+            }
             this.sendResults(msg, results);
         }
 
@@ -155,11 +152,24 @@ module.exports = class RollCommand extends Command{
     }
 
     doOptions(results, n, x, b, options) {
-        if(options == undefined) return;
+        if(options == undefined) return results;
 
         if(options.find( elt => elt.name==='-sort' )) results.sort((x, y) => y-x);
         
         if(options.find( elt => elt.name==='-isort' )) results.sort((x, y) => x-y);
+
+        if(options.find( elt => elt.name==='-adv' )){
+            let max = Math.max(...results);
+            results.splice(0, results.length);
+            results.push(max);
+        }
+
+        if(options.find( elt => elt.name==='-dis' )){
+            let min = Math.min(...results);
+            results.splice(0, results.length);
+            results.push(min);
+        } 
+        
     }
 
     checkAlies(text){
@@ -226,10 +236,10 @@ module.exports = class RollCommand extends Command{
     parseOptions(options, msg) {
         let flags = [];
         //let matched;
-        console.log(options);
+        //console.log(options);
 
         let list = options.split(/\s+/); //does not split properly
-        console.log(list);
+        ///console.log(list);
         for(let i=0; i<list.length; i++){
             let op = list[i]; //what about flags with arguments
             if(disallowedFlagPairs.has(op)){

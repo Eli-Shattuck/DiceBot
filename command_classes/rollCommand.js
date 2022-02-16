@@ -1,4 +1,6 @@
 const Command = require('./command.js');
+const BatchList = require('../io_classes/batchList.js')
+
 
 const aliesLen = '--roll 0123'.length;
 const alieses = {
@@ -67,31 +69,7 @@ const disallowedFlagPairs = new Map([
     ])],
 ])
 
-class BatchList {
-	constructor() {
-		this.batches = [''];
-		this.currentBatch = 0;
-	}
-	
-	push(newData) {
-		if(this.batches[this.currentBatch].length + newData.length < BATCH_SIZE-1) {
-			this.batches[this.currentBatch] += newData;
-			return;
-		}
-		if(newData.length >= BATCH_SIZE-1) {
-			let i = 0;
-			while(i < newData.length) {
-				this.batches[++this.currentBatch] = newData.subString(i, i+BATCH_SIZE);
-				i+=BATCH_SIZE;
-			}
-			this.batches[++this.currentBatch] = newData.subString(i);
-			return;
-		}
-		
-		this.batches[++this.currentBatch] = newData;
-		return;
-	}
-}
+
 
 module.exports = class RollCommand extends Command{
     constructor(){
@@ -123,7 +101,7 @@ module.exports = class RollCommand extends Command{
         //TODO: ROLL THE DICE!!!!!!!!!
         let results = this.rollDice(n, x);
 
-        
+        this.sendResults(msg, results);
 
         //TODO: Include batch printing
         // let reply = msg.author.username + ' is rolling...';
@@ -133,6 +111,15 @@ module.exports = class RollCommand extends Command{
         // for(let i=0; i<results.length; i++){
             
         // }
+    }
+
+    sendResults(msg, results){
+        msg.channel.send(`${msg.author} is rolling...`);
+        let toSend = "";
+        for(let res of results) {
+            toSend += res + "\n";
+        }
+        msg.channel.send(toSend);
     }
 
     checkAlies(text){

@@ -1,4 +1,5 @@
 const Command = require('./command.js');
+const BatchList = require('../io_classes/batchList.js')
 
 const aliesLen = '--roll 0123'.length;
 const alieses = {
@@ -67,46 +68,22 @@ const disallowedFlagPairs = new Map([
     ])],
 ])
 
-class BatchList {
-	constructor() {
-		this.batches = [''];
-		this.currentBatch = 0;
-	}
-	
-	push(newData) {
-		if(this.batches[this.currentBatch].length + newData.length < BATCH_SIZE-1) {
-			this.batches[this.currentBatch] += newData;
-			return;
-		}
-		if(newData.length >= BATCH_SIZE-1) {
-			let i = 0;
-			while(i < newData.length) {
-				this.batches[++this.currentBatch] = newData.subString(i, i+BATCH_SIZE);
-				i+=BATCH_SIZE;
-			}
-			this.batches[++this.currentBatch] = newData.subString(i);
-			return;
-		}
-		
-		this.batches[++this.currentBatch] = newData;
-		return;
-	}
-}
+
 
 module.exports = class RollCommand extends Command{
     constructor(){
         super();
-        this.adv = false;
-        this.dis = false;
-        this.sort = false;
-        this.hist = false;
-        this.pick = false;
-        this.sum = false;
-        this.loop = 1;
+        // this.adv = false;
+        // this.dis = false;
+        // this.sort = false;
+        // this.hist = false;
+        // this.pick = false;
+        // this.sum = false;
+        // this.loop = 1;
     }
 
     static getRollRe(){
-        return /^--roll\s*(\d*)\s*[dD]\s*(\d+)\s*([+-]\s*\d+){0,1}\s*(-[^-].+){0,1}/;
+        return /^--roll\s*(\d*)\s*[dD]\s*(\d+)\s*([+-]\s*\d+){0,1}\s*(-[^-].+){0,1}(.*)/;
     }
 
     match(msg){
@@ -123,14 +100,25 @@ module.exports = class RollCommand extends Command{
         //TODO: ROLL THE DICE!!!!!!!!!
         let results = this.rollDice(n, x);
 
-        //TODO: Include batch printing
-        let reply = msg.author.username + ' is rolling...';
-        let batches = new BatchList();
+        this.sendResults(msg, results);
 
-        batches.push(message + '\n');
-        for(let i=0; i<results.length; i++){
+        //TODO: Include batch printing
+        // let reply = msg.author.username + ' is rolling...';
+        // let batches = new BatchList();
+
+        // batches.push(message + '\n');
+        // for(let i=0; i<results.length; i++){
             
+        // }
+    }
+
+    sendResults(msg, results){
+        msg.channel.send(`${msg.author} is rolling...`);
+        let toSend = "";
+        for(let res of results) {
+            toSend += res + "\n";
         }
+        msg.channel.send(toSend);
     }
 
     checkAlies(text){
@@ -151,7 +139,7 @@ module.exports = class RollCommand extends Command{
             if(matchRoll[1]) {
                 n = parseInt(matchRoll[1]);
                 if(n == NaN) {
-                    this.error(msg, `Invalid argument for n, ${matchRoll[1]}.`);
+                    this.error(msg, `Invalid argument for n: "${matchRoll[1]}".`);
                     return ;
                 }
             } else {
@@ -161,22 +149,30 @@ module.exports = class RollCommand extends Command{
             if(matchRoll[2] && !isNaN(matchRoll[2])) {
                 x = parseInt(matchRoll[2]);
             } else {
-                this.error(msg, `Invalid argument for x, ${matchRoll[2]}.`);
+                this.error(msg, `Invalid argument for x: "${matchRoll[2]}".`);
                 return;
             }
 
             if(matchRoll[3]) {
                 b = parseInt(matchRoll[3]);
                 if(n == NaN) {
-                    this.error(msg, `Invalid argument for b, ${matchRoll[3]}.`);
+                    this.error(msg, `Invalid argument for b: "${matchRoll[3]}".`);
                     return;
                 }
             } else {
                 b = 0;
             }
             
-            options = this.parseOptions(matchRoll[4], msg);
-            if(options == undefined) return;
+            if(matchRoll[4]) {
+                options = this.parseOptions(matchRoll[4], msg);
+                if(options == undefined) return;
+            }
+            
+            if(matchRoll[5]){
+                this.error(msg, `Unknown flag(s): "${matchRoll[5]}".`);
+                return;
+            }
+            
 
         } else {
             this.error(msg, 'Your message did not match the expected format.');
@@ -189,8 +185,10 @@ module.exports = class RollCommand extends Command{
     parseOptions(options, msg) {
         let flags = new Set();
         //let matched;
+        console.log(options);
 
         let list = options.split(/\s+/); //does not split properly
+        console.log(list);
         for(let i=0; i<list.length; i++){
             let op = list[i]; //what about flags with arguments
             if(disallowedFlagPairs.has(op)){
@@ -198,7 +196,7 @@ module.exports = class RollCommand extends Command{
                 for(let flag of flags){
                     if(disSet.has(flag)){
                         if(flag === op){
-                            this.error(msg, `Repeated flag: ${op}.`)
+                            this.error(msg, `Repeated flag: "${op}".`)
                         } else {
                             this.error(msg, `Cannot set ${op} with ${flag}.`)
                         }
@@ -208,7 +206,7 @@ module.exports = class RollCommand extends Command{
                 flags.add(op);
 
             } else {
-                this.error(msg, `This flag was not recognized: ${op}.`);
+                this.error(msg, `Unknown flag: "${op}".`);
                 return;
             }
         }

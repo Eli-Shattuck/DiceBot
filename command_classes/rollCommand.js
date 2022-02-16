@@ -158,6 +158,13 @@ module.exports = class RollCommand extends Command{
         
         if(options.find( elt => elt.name==='-isort' )) results.sort((x, y) => x-y);
 
+        const pick = options.find( elt => elt.name==='-pick' );
+        if(pick){
+            let topN = results.splice(0, parseInt(pick.args[0]));
+            results.splice(0, results.length);
+            results.push(...topN);
+        }
+
         if(options.find( elt => elt.name==='-adv' )){
             let max = Math.max(...results);
             results.splice(0, results.length);

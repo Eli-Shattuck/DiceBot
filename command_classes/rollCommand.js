@@ -25,16 +25,28 @@ const alieses = {
 //     '-loop',    //takes argument k, repeats the command k times
 // ]
 
-const flagsWithArgs = new Set([
-    '-pick',
-    '-loop',
-])
+const flagArgCount = {
+    '-adv': 0, 
+    '-dis': 0, 
+    '-sort': 0,
+    '-isort': 0,
+    '-hist': 0,
+    '-pick': 1,
+    '-sum': 0, 
+    '-loop': 1,
+}
+
+const flagArgType = {
+    '-pick': /\d+/,
+    '-loop': /\d+/,
+}
 
 const disallowedFlagPairs = new Map([
     ['-adv' ,  new Set([
         '-adv',
         '-dis',
         '-sort',
+        '-isort',
         '-pick',
         '-sum',
     ])],
@@ -42,6 +54,7 @@ const disallowedFlagPairs = new Map([
         '-dis',
         '-adv',
         '-sort',
+        '-isort',
         '-pick',
         '-sum',
     ])],
@@ -49,6 +62,13 @@ const disallowedFlagPairs = new Map([
         '-dis',
         '-adv',
         '-sort',
+        '-isort',
+    ])],
+    ['-isort' ,  new Set([
+        '-dis',
+        '-adv',
+        '-sort',
+        '-isort',
     ])],
     ['-hist' ,  new Set([
         '-hist',
@@ -62,6 +82,7 @@ const disallowedFlagPairs = new Map([
         '-dis',
         '-adv',
         '-sort',
+        '-isort',
         '-sum',
     ])],
     ['-loop' ,  new Set([
@@ -69,7 +90,12 @@ const disallowedFlagPairs = new Map([
     ])],
 ])
 
-
+class Flag {
+    constructor(name, args) {
+        this.name = name;
+        this.args = args;
+    }
+}
 
 module.exports = class RollCommand extends Command{
     constructor(){
@@ -98,10 +124,16 @@ module.exports = class RollCommand extends Command{
 
         let [n, x, b, options] = args;
         console.log(n, x, b, options);
-        //TODO: ROLL THE DICE!!!!!!!!!
-        let results = this.rollDice(n, x);
-
-        this.sendResults(msg, results);
+        
+        let results, loop;
+        let loopSize = 1;
+        if(options) loop = options.find( elt => elt.name==='-loop' );
+        if(loop) loopSize = parseInt(loop.args[0]);
+        for(let i = 0; i < loopSize; i++) {
+            results = this.rollDice(n, x);
+            this.doOptions(results, n, x, b, options);
+            this.sendResults(msg, results);
+        }
 
         //TODO: Include batch printing
         // let reply = msg.author.username + ' is rolling...';
@@ -120,6 +152,14 @@ module.exports = class RollCommand extends Command{
             toSend += res + "\n";
         }
         msg.channel.send(toSend);
+    }
+
+    doOptions(results, n, x, b, options) {
+        if(options == undefined) return;
+
+        if(options.find( elt => elt.name==='-sort' )) results.sort((x, y) => y-x);
+        
+        if(options.find( elt => elt.name==='-isort' )) results.sort((x, y) => x-y);
     }
 
     checkAlies(text){
@@ -184,7 +224,7 @@ module.exports = class RollCommand extends Command{
     }
 
     parseOptions(options, msg) {
-        let flags = new Set();
+        let flags = [];
         //let matched;
         console.log(options);
 
@@ -195,16 +235,32 @@ module.exports = class RollCommand extends Command{
             if(disallowedFlagPairs.has(op)){
                 let disSet = disallowedFlagPairs.get(op);
                 for(let flag of flags){
-                    if(disSet.has(flag)){
-                        if(flag === op){
+                    if(disSet.has(flag.name)){
+                        if(flag.name === op){
                             this.error(msg, `Repeated flag: "${op}".`)
                         } else {
-                            this.error(msg, `Cannot set ${op} with ${flag}.`)
+                            this.error(msg, `Cannot set ${op} with ${flag.name}.`)
                         }
                         return;
                     }
                 }
-                flags.add(op);
+                let toAdd = new Flag(op, []);
+                flags.push(toAdd);
+                let fac = flagArgCount[op];
+                while (fac-- > 0) {
+                    if(i < list.length) {
+                        let arg = list[++i];
+                        if(arg.match(flagArgType[op])) {
+                            toAdd.args.push(arg);
+                        } else {
+                            this.error(msg, `Invalid argument "${arg}" for flag "${op}".`);
+                            return;
+                        }
+                    } else {
+                        this.error(msg, `Not enough args passed to flag: "${op}".`);
+                        return;
+                    }
+                }
 
             } else {
                 this.error(msg, `Unknown flag: "${op}".`);

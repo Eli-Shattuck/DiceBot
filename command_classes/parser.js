@@ -16,7 +16,7 @@ module.exports = class Parser{
                 return;
             }
         } 
-        this.msg.reply(`Unknown command:\n[${this.msg.content}]`);
+        if(this.msg.content.indexOf('--') === 0) this.msg.reply(`Unknown command:\n[${this.msg.content}]`);
         return;
     }
 

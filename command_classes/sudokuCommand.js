@@ -11,7 +11,7 @@ module.exports = class SudokuCommand extends Command {
     }
 
     static getSudokuRe(){
-      return /(((\d\s*){9})[\n\r]+){8}(((\d\s*){9})[\n\r]*){1}/;
+      return /--sudoku\s+(((\d\s*){9})[\n\r]+){8}(((\d\s*){9})[\n\r]*){1}/;
     }
 
     match(msg){
@@ -100,7 +100,8 @@ module.exports = class SudokuCommand extends Command {
     }
 
     sanitizeInput(unclean){
-      let clean = unclean.replace(/\s/g, '');
+      let clean = unclean.split(/\s/).slice(1).join('');
+      //let clean = unclean.replace(/\s/g, '');
       let grid = [
         [0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0],

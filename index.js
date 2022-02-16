@@ -8,8 +8,8 @@ client.on('ready', () => {
 })
 
 client.on('message', msg => {
-    if(msg.author.bot) return;
-    
+    if(msg.author.bot || this.msg.content.indexOf('--') !== 0) return;
+
     let p = new Parser(msg);
     p.parse();
     //msg.reply('Hello world!');

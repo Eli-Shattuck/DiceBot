@@ -3,8 +3,6 @@ const client = new Discord.Client();
 require("dotenv").config();
 const Parser = require('./parser_classes/parser.js');
 
-
-
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 })

@@ -6,6 +6,28 @@ const alieses = {
     '--roll stat' : '--roll 4d6 -pick 3 -sum',
     '--roll nice' : '--roll 69d69 -adv',
 }
+
+//command in form: --roll 𝑛 d 𝑥 [+/-] 𝑏 -flag0 arg0 -flag1 arg1…
+//rolls n dice
+//of size d sides
+//adds b to each roll (after -sum)
+//flags have special actions:
+
+// const flags = [
+//     '-adv',     //roll multiple dice and only return the highest
+//     '-dis',     //roll multiple dice and only return the lowest
+//     '-sort',    //return list of results in sorted order
+//     '-hist',    //return histogram of results
+//     '-pick',    //takes argument k, only return higest k rolls
+//     '-sum',     //sums all rolls and returns the total
+//     '-loop',    //takes argument k, repeats the command k times
+// ]
+
+const flagsWithArgs = new Set([
+    '-pick',
+    '-loop',
+])
+
 const disallowedFlagPairs = new Map([
     ['-adv' ,  new Set([
         '-adv',
@@ -45,9 +67,42 @@ const disallowedFlagPairs = new Map([
     ])],
 ])
 
+class BatchList {
+	constructor() {
+		this.batches = [''];
+		this.currentBatch = 0;
+	}
+	
+	push(newData) {
+		if(this.batches[this.currentBatch].length + newData.length < BATCH_SIZE-1) {
+			this.batches[this.currentBatch] += newData;
+			return;
+		}
+		if(newData.length >= BATCH_SIZE-1) {
+			let i = 0;
+			while(i < newData.length) {
+				this.batches[++this.currentBatch] = newData.subString(i, i+BATCH_SIZE);
+				i+=BATCH_SIZE;
+			}
+			this.batches[++this.currentBatch] = newData.subString(i);
+			return;
+		}
+		
+		this.batches[++this.currentBatch] = newData;
+		return;
+	}
+}
+
 module.exports = class RollCommand extends Command{
     constructor(){
         super();
+        this.adv = false;
+        this.dis = false;
+        this.sort = false;
+        this.hist = false;
+        this.pick = false;
+        this.sum = false;
+        this.loop = 1;
     }
 
     static getRollRe(){
@@ -64,12 +119,18 @@ module.exports = class RollCommand extends Command{
         if(args == undefined) return;
 
         let [n, x, b, options] = args;
-
-        //TODO: ROLL THE DICE!!!!!!!!!
-        //TODO: Include batch printing
-
-        //console.log(disallowedFlagPairs);
         console.log(n, x, b, options);
+        //TODO: ROLL THE DICE!!!!!!!!!
+        let results = this.rollDice(n, x);
+
+        //TODO: Include batch printing
+        let reply = msg.author.username + ' is rolling...';
+        let batches = new BatchList();
+
+        batches.push(message + '\n');
+        for(let i=0; i<results.length; i++){
+            
+        }
     }
 
     checkAlies(text){
@@ -127,11 +188,11 @@ module.exports = class RollCommand extends Command{
 
     parseOptions(options, msg) {
         let flags = new Set();
-        let matched;
+        //let matched;
 
-        let list = options.split(/\s+/);
+        let list = options.split(/\s+/); //does not split properly
         for(let i=0; i<list.length; i++){
-            let op = list[i];
+            let op = list[i]; //what about flags with arguments
             if(disallowedFlagPairs.has(op)){
                 let disSet = disallowedFlagPairs.get(op);
                 for(let flag of flags){
@@ -153,6 +214,17 @@ module.exports = class RollCommand extends Command{
         }
 
         return flags;
+    }
+
+    rollDice(n, x){
+        let nums = [];
+		
+		for(let i = 0; i < n; i++){
+			let r = Math.ceil(Math.random()*x);
+			nums.push(r);
+			//console.log(r);
+		}
+        return nums;
     }
 
     error(msg, errMsg) {

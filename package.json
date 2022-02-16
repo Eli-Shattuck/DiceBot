@@ -1,0 +1,22 @@
+{
+  "name": "dicebot",
+  "version": "1.0.0",
+  "description": "A discord bot that allows you to generate random dice rolls",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "Eli Shattuck",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^8.2.0",
+    "matplotlib": "^1.0.0",
+    "prompt": "^1.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

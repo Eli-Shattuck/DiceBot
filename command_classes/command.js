@@ -4,4 +4,8 @@ module.exports = class Command{
     match(msg){}
 
     handle(msg){}
+
+    error(msg, errMsg) {
+        msg.reply(`${errMsg} Try --help for more info.`)
+    }
 }

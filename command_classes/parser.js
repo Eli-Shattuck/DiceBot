@@ -7,9 +7,8 @@ module.exports = class Parser{
     }
 
     parse() {
-        for(let Cmd of commandHandlers){
+        for(let cmd of commandHandlers){
             //console.log(Cmd);
-            let cmd = new Cmd();
             
             if(cmd.match(this.msg)){
                 cmd.handle(this.msg)

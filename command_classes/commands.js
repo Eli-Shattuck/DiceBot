@@ -1,7 +1,8 @@
 const SudokuCommand = require("./sudokuCommand");
 
 module.exports = [
-    require('./ilyCommand.js'),
-    require('./SudokuCommand.js'),
-    require('./rollCommand.js'),
+    new (require('./ilyCommand.js'))(),
+    new (require('./SudokuCommand.js'))(),
+    new (require('./rollCommand.js'))(),
+    new (require('./timer_classes/timerCommand.js'))(),
 ]

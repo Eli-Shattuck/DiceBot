@@ -406,8 +406,4 @@ module.exports = class RollCommand extends Command{
 		}
         return nums;
     }
-
-    error(msg, errMsg) {
-        msg.reply(`${errMsg} Try --help roll for more info.`)
-    }
 }

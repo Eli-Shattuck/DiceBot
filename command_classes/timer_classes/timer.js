@@ -1,10 +1,10 @@
 module.exports = class Timer{
-    constructor(mins, secs){
+    constructor(mins, secs, initMessage, user) {
         this.intervalId;
         this.time = mins*60 + secs;
-        this.user;
+        this.user = user;
         this.message;
-        this.initMessage;
+        this.initMessage = initMessage;
         this.running = false;
         this.increment = -1;
     }
@@ -20,6 +20,10 @@ module.exports = class Timer{
         secs = (''+secs).padStart(2, '0');
 
         return sign + mins + ':' + secs;
+    }
+
+    formatTimeString() {
+        return `${this.user}, your time: ${this.timeToString()}.`;
     }
 
     start() {
@@ -38,9 +42,9 @@ module.exports = class Timer{
     }
 
     editMessage() {
-        console.log(this.message);
+        //console.log(this.message);
         this.message.edit(
-            `${this.user}, your time: ${this.timeToString()}.`
+            this.formatTimeString()
         )
     }
 }

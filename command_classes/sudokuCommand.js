@@ -15,17 +15,22 @@ module.exports = class SudokuCommand extends Command {
     }
 
     match(msg){
-        return msg.content.match(SudokuCommand.getSudokuRe()); //regex match
+        return msg.content.indexOf('--sudoku') === 0;//msg.content.match(SudokuCommand.getSudokuRe()); //regex match
     }
 
     handle(msg){
-        let grid = this.sanitizeInput(msg.content);
-        if(this.solveGrid(grid)){
-          msg.reply(this.toStringGrid(grid));
-        } else {
-          msg.reply('no solution exists'); 
-        }	
+      if(!msg.content.match(SudokuCommand.getSudokuRe())) {
+        this.error(msg, 'Your message did not match the expected format.');
         return;
+      }
+    
+      let grid = this.sanitizeInput(msg.content);
+      if(this.solveGrid(grid)){
+        msg.reply(this.toStringGrid(grid));
+      } else {
+        msg.reply('no solution exists'); 
+      }	
+      return;
     }
 
      //TODO: deal with slow unsolvable grids

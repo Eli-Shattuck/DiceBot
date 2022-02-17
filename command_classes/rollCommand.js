@@ -36,6 +36,7 @@ const flagArgCount = {
     '-pick': 1,
     '-sum': 0, 
     '-loop': 1,
+    '-bazz': 0,
 }
 
 const flagArgType = {
@@ -96,6 +97,9 @@ const disallowedFlagPairs = new Map([
     ['-loop' ,  new Set([
         '-loop',
     ])],
+    ['-bazz' ,  new Set([
+        '-bazz',
+    ])],
 ])
 
 class Flag {
@@ -131,12 +135,15 @@ module.exports = class RollCommand extends Command{
         if(options) loop = options.find( elt => elt.name==='-loop' );
         if(loop) loopSize = parseInt(loop.args[0]);
 
+        let bazz;
+        if(options) bazz = options.find( elt => elt.name==='-bazz' );
+
         msg.channel.send(`${msg.author} is rolling...`);
 
         for(let i = 0; i < loopSize; i++) {
             let results = this.rollDice(n, x);
             let extra = this.doOptions(results, n, x, b, options);
-            this.sendResults(msg, results, extra);
+            this.sendResults(msg, results, extra, bazz);
         }
 
         //TODO: Include batch printing
@@ -149,17 +156,28 @@ module.exports = class RollCommand extends Command{
         // }
     }
 
-    sendResults(msg, results, extraLines){
-        let toSend = "";
-        for(let res of results) {
-            toSend += res + "\n";
+    sendResults(msg, results, extraLines, bazz){
+        if(bazz) {
+            for(let res of results) {
+                msg.channel.send(
+                    `./command_classes/bazz/baz-${res}.png`, 
+                    { files: [`./command_classes/bazz/baz-${res}.png`] }
+                );
+            }
+        } else {
+            let toSend = "";
+            for(let res of results) {
+                toSend += res + "\n";
+            }
+            msg.channel.send(toSend);
         }
         if(extraLines) {
+            let toSend = '';
             for(let line of extraLines) {
                 toSend += line + "\n";
             }
+            msg.channel.send(toSend);
         }
-        msg.channel.send(toSend);
     }
 
     makeHist(results, n, x, b, chist) {

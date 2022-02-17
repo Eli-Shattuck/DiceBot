@@ -3,11 +3,11 @@ const Timer = require('./timer.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
 const UIEmojis = require('../../io_classes/UIEmojis');
 
-const PLAY = UIEmojis.PLAY.toString();
-const PAUSE = UIEmojis.PAUSE.toString();
-const STOP = UIEmojis.STOP.toString();
-const INCREASE = UIEmojis.INCREASE.toString();
-const DECREASE = UIEmojis.DECREASE.toString();
+const PLAY = UIEmojis.PLAY;
+const PAUSE = UIEmojis.PAUSE;
+const STOP = UIEmojis.STOP;
+const INCREASE = UIEmojis.INCREASE;
+const DECREASE = UIEmojis.DECREASE;
 
 module.exports = class TimerCommand extends Command{
     constructor(){
@@ -38,21 +38,21 @@ module.exports = class TimerCommand extends Command{
             t.message = message;
             this.timerMap[t.message.id] = t;
             reactionHandler.addCallback(
-                [PLAY, PAUSE],
+                [PLAY.toString(), PAUSE.toString()],
                 t.message,
                 this.onPlayPause.bind(this)
             );
             reactionHandler.addCallback(
-                [INCREASE, DECREASE],
+                [INCREASE.toString(), DECREASE.toString()],
                 t.message,
                 this.onUpDown.bind(this)
             );
             reactionHandler.addCallback(
-                [STOP],
+                [STOP.toString()],
                 t.message,
                 this.onStop.bind(this)
             );
-            reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
+            reactionHandler.addReactions([STOP.toString(), DECREASE.toString(), PLAY.toString()], message);
         });
 
 
@@ -66,15 +66,16 @@ module.exports = class TimerCommand extends Command{
         let t = this.timerMap[msg.id];
         if(t.running){
             t.pause();
-            if(emoji == PLAY) return;
+            if(emoji == PLAY.toString()) return;
         } else {
             t.start();
-            if(emoji == PAUSE) return;
+            if(emoji == PAUSE.toString()) return;
         }
         reactionHandler.toggleEmoji(PLAY, PAUSE, msg);
     }
 
     onUpDown(reaction){
+        console.log('called upDown');
         this.timerMap[reaction.message.id].increment *= -1;
         reactionHandler.toggleEmoji(INCREASE, DECREASE, reaction.message);
     }

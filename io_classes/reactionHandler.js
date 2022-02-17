@@ -2,17 +2,18 @@ let callbacks = new Map();
 module.exports = {
     onReaction: (reaction, user) => {
         if(callbacks[reaction.message.id] && callbacks[reaction.message.id][reaction.emoji.identifier]) {
-            console.log(reaction.emoji.identifier);
-            callbacks[reaction.message.id][reaction.emoji.identifier] (reaction, user);
+            //console.log(reaction.emoji.identifier, callbacks[reaction.message.id]);
+            //console.log(callbacks[reaction.message.id][reaction.emoji.identifier]);
+            callbacks[reaction.message.id][reaction.emoji.identifier](reaction, user);
         }
     },
 
-    addCallback: (emojiIdentifiers, message, callback) => {
-        for(let emoji of emojiIdentifiers) {
+    addCallback: (emojiObjects, message, callback) => {
+        for(let emoji of emojiObjects) {
             if(!callbacks[message.id]) {
                 callbacks[message.id] = new Map();
             }
-            callbacks[message.id][emoji] = callback;
+            callbacks[message.id][emoji.toString()] = callback;
         }
     },
 
@@ -30,28 +31,30 @@ module.exports = {
         }
     },
 
-    addReactions: (emojiIdentifiers, message) => {
-        console.log(emojiIdentifiers);
-        for(let emoji of emojiIdentifiers) message.react(emoji);
+    addReactions: (emojiObjects, message) => {
+        //console.log(emojiIdentifiers);
+        for(let emoji of emojiObjects) message.react(emoji.toString());
     },
 
-    removeReactions: (emojiIdentifiers, message) => {
-        for(let emoji of emojiIdentifiers) {
-            let found = message.reactions.cache.get(emoji);
+    removeReactions: (emojiObjects, message) => {
+        for(let emoji of emojiObjects) {
+            let found = message.reactions.cache.get(emoji.id);
             if(found) found.remove();
         }
     },
 
-    toggleEmoji: (emojiAIdentifier, emojiBIdentifier, message) => {
-        let isA = message.reactions.cache.get(emojiAIdentifier);
-        let isB = message.reactions.cache.get(emojiBIdentifier);
+    toggleEmoji: (emojiAObject, emojiBObject, message) => {
+        console.log('called toggle', message);
+        let isA = message.reactions.cache.get(emojiAObject.id);
+        let isB = message.reactions.cache.get(emojiBObject.id);
+        console.log(isA, isB);
         if(isA) {
             isA.remove();
-            message.react(emojiBIdentifier);
+            message.react(emojiBObject.toString());
         }
         if(isB) {
             isB.remove();
-            message.react(emojiAIdentifier);
+            message.react(emojiAObject.toString());
         }
     }
 }

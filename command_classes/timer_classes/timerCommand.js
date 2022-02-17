@@ -10,7 +10,7 @@ const DOWN = '🔽';
 const PAUSE = '⏸';
 const PLAY = '▶️';
 const STOP = '⏹';
-const NEXT = '⏭';
+//const NEXT = '⏭';
 
 module.exports = class TimerCommand extends Command{
     constructor(){

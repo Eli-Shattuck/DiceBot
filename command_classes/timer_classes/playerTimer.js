@@ -4,6 +4,7 @@ const Discord = require('discord.js');
 module.exports = class PlayerTimer extends Timer{
     constructor(mins, secs, initMessage, user, title, creator){
         super(mins, secs, initMessage, user);
+        console.log(user, this.user);
         this.selected = false;
         this.title = title;
         this.creator = creator;
@@ -46,9 +47,9 @@ module.exports = class PlayerTimer extends Timer{
             messageEmbed.addField('```' + player.user + '```', timeString, false);
         }
         
-        let currName = PlayerTimer.get(initiativeIndex, initiativeArray);
-        let deckName = PlayerTimer.get(initiativeIndex+1, initiativeArray);
-        let deckDeckName = PlayerTimer.get(initiativeIndex+2, initiativeArray);
+        let currName = PlayerTimer.get(initiativeIndex[0], initiativeArray);
+        let deckName = PlayerTimer.get(initiativeIndex[0]+1, initiativeArray);
+        let deckDeckName = PlayerTimer.get(initiativeIndex[0]+2, initiativeArray);
         
         messageEmbed.addFields(
                 { name: '\u200B', value: '\u200B' },

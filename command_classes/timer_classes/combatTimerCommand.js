@@ -1,9 +1,9 @@
 const Command = require('../command.js');
 const PlayerTimer = require('./playerTimer.js');
-const ReactionHandler = require('../../io_classes/reactionHandler.js');
+const reactionHandler = require('../../io_classes/reactionHandler.js');
 
-const UP = '🔼';
-const DOWN = '🔽';
+//const UP = '🔼';
+//const DOWN = '🔽';
 //const UP = '📈';
 //const DOWN = '📉';
 
@@ -20,7 +20,7 @@ class CTimer{
     constructor(){
         this.players = [];
         this.initiativeArray = []; //array of initTokens
-        this.initiativeIndex = 0;
+        this.initiativeIndex = [0];
     }
 }
 
@@ -80,8 +80,9 @@ module.exports = class CombatTimerCommand extends Command{
                 let secs = row[4] ? parseInt(row[4]) : defaultSecs;
 				
                 let curPlayer;
-				for(let player in ct.players){
-                    if(player.user === name_tag[0]) curPlayer = player;
+				for(let i in ct.players){
+                    //console.log(player, name_tag[0]);
+                    if(ct.players[i].user == name_tag[0]) curPlayer = ct.players[i];
                 }
                 if(curPlayer == undefined){ 
                     curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0], title, creator);
@@ -91,7 +92,7 @@ module.exports = class CombatTimerCommand extends Command{
                 let token = new InitToken(row[2], curPlayer, name_tag[1]);
                 ct.initiativeArray.push(token);
             }
-
+            //console.log(ct.players);
 			ct.initiativeArray.sort((a,b) => b.initiative - a.initiative);
             ct.players.forEach(player => {
                 player.playerArray = ct.players;
@@ -105,13 +106,60 @@ module.exports = class CombatTimerCommand extends Command{
 			msg.channel.send(toSend)
 			.then(message => {
 				ct.players.forEach(player => player.message = message);
-				ReactionHandler.addReactions([STOP, PLAY], message);
                 this.combatTimerMap[message.id] = ct;
+
+                reactionHandler.addCallback(
+                    [PLAY, PAUSE],
+                    message,
+                    this.onPlayPause.bind(this)
+                );
+                reactionHandler.addCallback(
+                    [NEXT],
+                    message,
+                    this.onNext.bind(this)
+                );
+                reactionHandler.addCallback(
+                    [STOP],
+                    message,
+                    this.onStop.bind(this)
+                );
+                reactionHandler.addReactions([STOP, PLAY], message);
 			});
 		} else {
 			if(header) this.error(msg, 'The first line of your message does not match the expected format.');
             else this.error(msg, 'Your message does not match the expected format because you do not have enough lines.');
 		}
 		return;
+    }
+
+    onPlayPause(msg, emoji){
+        let ct = this.combatTimerMap[msg.id];
+        let player = ct.initiativeArray[ct.initiativeIndex[0]].player;
+        if(player.running){
+            player.pause();
+            reactionHandler.removeReactions([NEXT], msg);
+            if(emoji == PLAY) return;
+        } else {
+            player.start();
+            reactionHandler.addReactions([NEXT], msg);
+            if(emoji == PAUSE) return;
+        }
+        reactionHandler.toggleEmoji(PLAY, PAUSE, msg);
+    }
+
+    onNext(msg, emoji){
+        let ct = this.combatTimerMap[msg.id];
+        ct.initiativeArray[ct.initiativeIndex[0]].player.pause();
+
+        ct.initiativeIndex[0] = (ct.initiativeIndex[0] + 1) % ct.initiativeArray.length;
+        ct.initiativeArray[ct.initiativeIndex[0]].player.start();
+    }
+
+    onStop(msg, emoji){
+        let ct = this.combatTimerMap[msg.id];
+        ct.initiativeArray[ct.initiativeIndex[0]].player.stop();
+        this.combatTimerMap.delete(msg.id);
+        reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP], msg);
+        reactionHandler.removeAllCallbacks(msg);
     }
 }

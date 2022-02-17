@@ -1,5 +1,16 @@
 const Command = require('../command.js');
 const Timer = require('./timer.js');
+const reactionHandler = require('../../io_classes/reactionHandler.js');
+
+const UP = '🔼';
+const DOWN = '🔽';
+//const UP = '📈';
+//const DOWN = '📉';
+
+const PAUSE = '⏸';
+const PLAY = '▶️';
+const STOP = '⏹';
+const NEXT = '⏭';
 
 module.exports = class TimerCommand extends Command{
     constructor(){
@@ -29,8 +40,17 @@ module.exports = class TimerCommand extends Command{
         msg.channel.send(t.formatTimeString()).then(message => {
             t.message = message;
             this.timerMap[msg.id] = t;
+            reactionHandler.addCallback(
+                PLAY,
+                t.message,
+                this.onPlay
+            );
         });
 
         return;
     };
+
+    onPlay(msg, emoji){
+        msg.reply(emoji);
+    }
 }

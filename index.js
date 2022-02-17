@@ -12,8 +12,8 @@ client.on('ready', () => {
 
 client.on('messageReactionAdd', (reaction, user) => {
     if(user.bot) return;
-    
-    reactionHandler.onReaction(reaction.emoji.name, reaction.message, user)
+    reactionHandler.onReaction(reaction, user);
+    //reactionHandler.onReaction(reaction.emoji.name, reaction.message, user);
 });
 
 client.on('message', msg => {

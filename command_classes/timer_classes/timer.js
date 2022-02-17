@@ -1,7 +1,7 @@
 module.exports = class Timer{
     constructor(mins, secs, initMessage, user) {
         this.intervalId;
-        this.time = mins*60 + secs;
+        this.time = mins * 60 + secs;
         this.user = user;
         this.message;
         this.initMessage = initMessage;

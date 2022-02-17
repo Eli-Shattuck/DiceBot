@@ -1,8 +1,8 @@
 let callbacks = new Map();
 module.exports = {
-    onReaction: (emoji, message, user) => {
-        if(callbacks[message.id] && callbacks[message.id][emoji]) {
-            callbacks[message.id][emoji] (message, emoji, user);
+    onReaction: (reaction, user) => {
+        if(callbacks[reaction.message.id] && callbacks[reaction.message.id][reaction.emoji.name]) {
+            callbacks[reaction.message.id][reaction.emoji.name] (reaction, user);
         }
     },
 

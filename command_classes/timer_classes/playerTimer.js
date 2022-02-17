@@ -4,7 +4,6 @@ const Discord = require('discord.js');
 module.exports = class PlayerTimer extends Timer{
     constructor(mins, secs, initMessage, user, title, creator){
         super(mins, secs, initMessage, user);
-        console.log(user, this.user);
         this.selected = false;
         this.title = title;
         this.creator = creator;

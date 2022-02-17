@@ -62,9 +62,10 @@ module.exports = class TimerCommand extends Command{
         return;
     }
 
-    onPlayPause(msg, emoji){
-        //console.log(msg.id);
-        //console.log(this.timerMap);
+    onPlayPause(reaction){
+        let msg = reaction.message;
+        let emoji = reaction.emoji.name;
+
         let t = this.timerMap[msg.id];
         if(t.running){
             t.pause();
@@ -76,12 +77,13 @@ module.exports = class TimerCommand extends Command{
         reactionHandler.toggleEmoji(PLAY, PAUSE, msg);
     }
 
-    onUpDown(msg, emoji){
-        this.timerMap[msg.id].increment *= -1;
-        reactionHandler.toggleEmoji(UP, DOWN, msg);
+    onUpDown(reaction){
+        this.timerMap[reaction.message.id].increment *= -1;
+        reactionHandler.toggleEmoji(UP, DOWN, reaction.message);
     }
 
-    onStop(msg, emoji){
+    onStop(reaction){
+        let msg = reaction.message;
         let t = this.timerMap[msg.id];
         t.stop();
         this.timerMap.delete(msg.id);

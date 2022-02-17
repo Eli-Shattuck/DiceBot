@@ -81,8 +81,12 @@ module.exports = class CombatTimerCommand extends Command{
 				
                 let curPlayer;
 				for(let i in ct.players){
-                    //console.log(player, name_tag[0]);
-                    if(ct.players[i].user == name_tag[0]) curPlayer = ct.players[i];
+                    let player = ct.players[i];
+                    if(player.user == name_tag[0]) {
+                        let newTime = mins * 60 + secs;
+                        if (newTime > player.time) player.time = newTime;
+                        curPlayer = player;
+                    }
                 }
                 if(curPlayer == undefined){ 
                     curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0], title, creator);
@@ -92,13 +96,12 @@ module.exports = class CombatTimerCommand extends Command{
                 let token = new InitToken(row[2], curPlayer, name_tag[1]);
                 ct.initiativeArray.push(token);
             }
-            //console.log(ct.players);
+
 			ct.initiativeArray.sort((a,b) => b.initiative - a.initiative);
             ct.players.forEach(player => {
                 player.playerArray = ct.players;
                 player.initiativeArray = ct.initiativeArray;
                 player.initiativeIndex = ct.initiativeIndex;
-                //console.log(player.playerArray, player.initiativeArray, player.initiativeIndex);
             });
 			
 			let toSend = PlayerTimer.makeEmbed(title, creator, ct.players, ct.initiativeArray, ct.initiativeIndex);			
@@ -132,7 +135,10 @@ module.exports = class CombatTimerCommand extends Command{
 		return;
     }
 
-    onPlayPause(msg, emoji){
+    onPlayPause(reaction){
+        let msg = reaction.message;
+        let emoji = reaction.emoji.name;
+
         let ct = this.combatTimerMap[msg.id];
         let player = ct.initiativeArray[ct.initiativeIndex[0]].player;
         if(player.running){
@@ -147,16 +153,19 @@ module.exports = class CombatTimerCommand extends Command{
         reactionHandler.toggleEmoji(PLAY, PAUSE, msg);
     }
 
-    onNext(msg, emoji){
+    onNext(reaction){
+        let msg = reaction.message;
         let ct = this.combatTimerMap[msg.id];
-        ct.initiativeArray[ct.initiativeIndex[0]].player.pause();
 
+        ct.initiativeArray[ct.initiativeIndex[0]].player.pause();
         ct.initiativeIndex[0] = (ct.initiativeIndex[0] + 1) % ct.initiativeArray.length;
         ct.initiativeArray[ct.initiativeIndex[0]].player.start();
     }
 
-    onStop(msg, emoji){
+    onStop(reaction){
+        let msg = reaction.message;
         let ct = this.combatTimerMap[msg.id];
+        
         ct.initiativeArray[ct.initiativeIndex[0]].player.stop();
         this.combatTimerMap.delete(msg.id);
         reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP], msg);

@@ -24,7 +24,7 @@ module.exports = class TimerCommand extends Command{
 
     match(msg){
         return msg.content.indexOf('--timer') === 0;
-    };
+    }
     
     handle(msg){
         let matchTimer = msg.content.match(TimerCommand.getTimerRe());
@@ -39,18 +39,53 @@ module.exports = class TimerCommand extends Command{
 
         msg.channel.send(t.formatTimeString()).then(message => {
             t.message = message;
-            this.timerMap[msg.id] = t;
+            this.timerMap[t.message.id] = t;
             reactionHandler.addCallback(
-                PLAY,
+                [PLAY, PAUSE],
                 t.message,
-                this.onPlay
+                this.onPlayPause.bind(this)
             );
+            reactionHandler.addCallback(
+                [UP, DOWN],
+                t.message,
+                this.onUpDown.bind(this)
+            );
+            reactionHandler.addCallback(
+                [STOP],
+                t.message,
+                this.onStop.bind(this)
+            );
+            reactionHandler.addReactions([STOP, DOWN, PLAY], message);
         });
 
-        return;
-    };
 
-    onPlay(msg, emoji){
-        msg.reply(emoji);
+        return;
+    }
+
+    onPlayPause(msg, emoji){
+        //console.log(msg.id);
+        //console.log(this.timerMap);
+        let t = this.timerMap[msg.id];
+        if(t.running){
+            t.pause();
+            if(emoji == PLAY) return;
+        } else {
+            t.start();
+            if(emoji == PAUSE) return;
+        }
+        reactionHandler.toggleEmoji(PLAY, PAUSE, msg);
+    }
+
+    onUpDown(msg, emoji){
+        this.timerMap[msg.id].increment *= -1;
+        reactionHandler.toggleEmoji(UP, DOWN, msg);
+    }
+
+    onStop(msg, emoji){
+        let t = this.timerMap[msg.id];
+        t.stop();
+        this.timerMap.delete(msg.id);
+        reactionHandler.removeReactions([PLAY, PAUSE, UP, DOWN, STOP], msg);
+        reactionHandler.removeAllCallbacks(msg);
     }
 }

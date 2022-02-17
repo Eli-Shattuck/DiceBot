@@ -34,17 +34,25 @@ module.exports = class Timer{
         }, 1000);
     }
 
-    stop() {
-        clearInterval(this.id);
-        this.id = undefined;
-        this.running = false;
-        this.editMessage();
+    pause(prefix) {
+        if(this.running) {
+            clearInterval(this.id);
+            this.id = undefined;
+            this.running = false;
+        }
+        this.editMessage(prefix);
     }
 
-    editMessage() {
+    stop() {
+        this.pause('Stopped: ');
+    }
+
+    editMessage(prefix) {
         //console.log(this.message);
+        let newMsg = this.formatTimeString();
+        if(prefix) newMsg = prefix + newMsg;
         this.message.edit(
-            this.formatTimeString()
+            newMsg
         )
     }
 }

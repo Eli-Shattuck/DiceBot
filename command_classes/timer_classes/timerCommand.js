@@ -1,16 +1,13 @@
 const Command = require('../command.js');
 const Timer = require('./timer.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
+const UIEmojis = require('../../io_classes/UIEmojis');
 
-const UP = '🔼';
-const DOWN = '🔽';
-//const UP = '📈';
-//const DOWN = '📉';
-
-const PAUSE = '⏸';
-const PLAY = '▶️';
-const STOP = '⏹';
-//const NEXT = '⏭';
+const PLAY = UIEmojis.PLAY.toString();
+const PAUSE = UIEmojis.PAUSE.toString();
+const STOP = UIEmojis.STOP.toString();
+const INCREASE = UIEmojis.INCREASE.toString();
+const DECREASE = UIEmojis.DECREASE.toString();
 
 module.exports = class TimerCommand extends Command{
     constructor(){
@@ -46,7 +43,7 @@ module.exports = class TimerCommand extends Command{
                 this.onPlayPause.bind(this)
             );
             reactionHandler.addCallback(
-                [UP, DOWN],
+                [INCREASE, DECREASE],
                 t.message,
                 this.onUpDown.bind(this)
             );
@@ -55,7 +52,7 @@ module.exports = class TimerCommand extends Command{
                 t.message,
                 this.onStop.bind(this)
             );
-            reactionHandler.addReactions([STOP, DOWN, PLAY], message);
+            reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
         });
 
 
@@ -79,7 +76,7 @@ module.exports = class TimerCommand extends Command{
 
     onUpDown(reaction){
         this.timerMap[reaction.message.id].increment *= -1;
-        reactionHandler.toggleEmoji(UP, DOWN, reaction.message);
+        reactionHandler.toggleEmoji(INCREASE, DECREASE, reaction.message);
     }
 
     onStop(reaction){
@@ -87,7 +84,7 @@ module.exports = class TimerCommand extends Command{
         let t = this.timerMap[msg.id];
         t.stop();
         this.timerMap.delete(msg.id);
-        reactionHandler.removeReactions([PLAY, PAUSE, UP, DOWN, STOP], msg);
+        reactionHandler.removeReactions([PLAY, PAUSE, INCREASE, DECREASE, STOP], msg);
         reactionHandler.removeAllCallbacks(msg);
     }
 }

@@ -2,16 +2,6 @@ const Command = require('../command.js');
 const PlayerTimer = require('./playerTimer.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
 
-//const UP = '🔼';
-//const DOWN = '🔽';
-//const UP = '📈';
-//const DOWN = '📉';
-
-const PAUSE = '⏸';
-const PLAY = '▶️';
-const STOP = '⏹';
-const NEXT = '⏭';
-
 // let players = [];
 // let initiativeArray = []; //array of initTokens
 // let initiativeIndex = 0;
@@ -80,8 +70,7 @@ module.exports = class CombatTimerCommand extends Command{
                 let secs = row[4] ? parseInt(row[4]) : defaultSecs;
 				
                 let curPlayer;
-				for(let i in ct.players){
-                    let player = ct.players[i];
+				for(let player of ct.players){
                     if(player.user == name_tag[0]) {
                         let newTime = mins * 60 + secs;
                         if (newTime > player.time) player.time = newTime;
@@ -141,31 +130,31 @@ module.exports = class CombatTimerCommand extends Command{
 
         let ct = this.combatTimerMap[msg.id];
         let player = ct.initiativeArray[ct.initiativeIndex[0]].player;
-        if(player.running){
+        if(player.running && emoji == PAUSE){
             player.pause();
-            reactionHandler.removeReactions([NEXT], msg);
-            if(emoji == PLAY) return;
-        } else {
+            reactionHandler.removeReactions([NEXT, PAUSE], msg);
+            reactionHandler.addReactions([PLAY], msg);
+        } else if(!player.running && emoji == PLAY){
             player.start();
-            reactionHandler.addReactions([NEXT], msg);
-            if(emoji == PAUSE) return;
+            reactionHandler.removeReactions([PLAY], msg);
+            reactionHandler.addReactions([NEXT, PAUSE], msg);
         }
-        reactionHandler.toggleEmoji(PLAY, PAUSE, msg);
     }
 
-    onNext(reaction){
+    onNext(reaction, user){
         let msg = reaction.message;
         let ct = this.combatTimerMap[msg.id];
 
         ct.initiativeArray[ct.initiativeIndex[0]].player.pause();
         ct.initiativeIndex[0] = (ct.initiativeIndex[0] + 1) % ct.initiativeArray.length;
         ct.initiativeArray[ct.initiativeIndex[0]].player.start();
+        reaction.users.remove(user.id);
     }
 
     onStop(reaction){
         let msg = reaction.message;
         let ct = this.combatTimerMap[msg.id];
-        
+
         ct.initiativeArray[ct.initiativeIndex[0]].player.stop();
         this.combatTimerMap.delete(msg.id);
         reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP], msg);

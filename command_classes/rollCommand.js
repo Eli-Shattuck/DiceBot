@@ -6,7 +6,7 @@ const aliesLen = '--roll 0123'.length;
 const alieses = {
     '--roll char' : '--roll 4d6 -pick 3 -loop 6 -sum',
     '--roll stat' : '--roll 4d6 -pick 3 -sum',
-    '--roll nice' : '--roll 69d69 -adv',
+    '--roll nice' : '--roll 69d69 -sort -pick 1',
 }
 
 //command in form: --roll 𝑛 d 𝑥 [+/-] 𝑏 -flag0 arg0 -flag1 arg1…
@@ -49,18 +49,10 @@ const disallowedFlagPairs = new Map([
     ['-adv' ,  new Set([
         '-adv',
         '-dis',
-        '-sort',
-        '-isort',
-        '-pick',
-        '-sum',
     ])],
     ['-dis' ,  new Set([
         '-dis',
         '-adv',
-        '-sort',
-        '-isort',
-        '-pick',
-        '-sum',
     ])],
     ['-sort' ,  new Set([
         '-dis',
@@ -138,10 +130,18 @@ module.exports = class RollCommand extends Command{
         let bazz;
         if(options) bazz = options.find( elt => elt.name==='-bazz' );
 
+        let adv;
+        if(options) adv = options.find( elt => elt.name==='-adv' );
+        let dis;
+        if(options) dis = options.find( elt => elt.name==='-dis' );
+
         msg.channel.send(`${msg.author} is rolling...`);
 
         for(let i = 0; i < loopSize; i++) {
-            let results = this.rollDice(n, x);
+            let results;
+            if(adv) results = this.rollDice(n, x, Math.max);
+            else if(dis) results = this.rollDice(n, x, Math.min);
+            else results = this.rollDice(n, x);
             let extra = this.doOptions(results, n, x, b, options);
             this.sendResults(msg, results, extra, bazz);
         }
@@ -277,17 +277,17 @@ module.exports = class RollCommand extends Command{
             const pick = options.find( elt => elt.name==='-pick' );
             if(pick) results.splice(parseInt(pick.args[0]), results.length);
 
-            if(options.find( elt => elt.name==='-adv' )){
-                let max = Math.max(...results);
-                results.splice(0, results.length);
-                results.push(max);
-            }
+            // if(options.find( elt => elt.name==='-adv' )){
+            //     let max = Math.max(...results);
+            //     results.splice(0, results.length);
+            //     results.push(max);
+            // }
 
-            if(options.find( elt => elt.name==='-dis' )){
-                let min = Math.min(...results);
-                results.splice(0, results.length);
-                results.push(min);
-            } 
+            // if(options.find( elt => elt.name==='-dis' )){
+            //     let min = Math.min(...results);
+            //     results.splice(0, results.length);
+            //     results.push(min);
+            // } 
 
             if(options.find( elt => elt.name==='-sum' )){
                 let sum = 0;
@@ -414,11 +414,16 @@ module.exports = class RollCommand extends Command{
         return flags;
     }
 
-    rollDice(n, x){
+    rollDice(n, x, advOrDis){
         let nums = [];
 		
 		for(let i = 0; i < n; i++){
 			let r = Math.ceil(Math.random()*x);
+
+            if(advOrDis) {
+                r = advOrDis(Math.ceil(Math.random()*x), r);
+            }
+
 			nums.push(r);
 			//console.log(r);
 		}

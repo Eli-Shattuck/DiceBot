@@ -38,21 +38,21 @@ module.exports = class TimerCommand extends Command{
             t.message = message;
             this.timerMap[t.message.id] = t;
             reactionHandler.addCallback(
-                [PLAY.toString(), PAUSE.toString()],
+                [PLAY, PAUSE],
                 t.message,
                 this.onPlayPause.bind(this)
             );
             reactionHandler.addCallback(
-                [INCREASE.toString(), DECREASE.toString()],
+                [INCREASE, DECREASE],
                 t.message,
                 this.onUpDown.bind(this)
             );
             reactionHandler.addCallback(
-                [STOP.toString()],
+                [STOP],
                 t.message,
                 this.onStop.bind(this)
             );
-            reactionHandler.addReactions([STOP.toString(), DECREASE.toString(), PLAY.toString()], message);
+            reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
         });
 
 

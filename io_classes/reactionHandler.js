@@ -44,10 +44,10 @@ module.exports = {
     },
 
     toggleEmoji: (emojiAObject, emojiBObject, message) => {
-        console.log('called toggle', message);
+        //console.log('called toggle', message);
         let isA = message.reactions.cache.get(emojiAObject.id);
         let isB = message.reactions.cache.get(emojiBObject.id);
-        console.log(isA, isB);
+        //console.log(isA, isB);
         if(isA) {
             isA.remove();
             message.react(emojiBObject.toString());

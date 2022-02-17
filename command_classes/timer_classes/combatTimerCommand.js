@@ -1,10 +1,12 @@
 const Command = require('../command.js');
 const PlayerTimer = require('./playerTimer.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
+const UIEmojis = require('../../io_classes/uiEmojis.js');
 
-// let players = [];
-// let initiativeArray = []; //array of initTokens
-// let initiativeIndex = 0;
+const PLAY = UIEmojis.PLAY;
+const PAUSE = UIEmojis.PAUSE;
+const STOP = UIEmojis.STOP;
+const NEXT = UIEmojis.NEXT;
 
 class CTimer{
     constructor(){
@@ -130,11 +132,11 @@ module.exports = class CombatTimerCommand extends Command{
 
         let ct = this.combatTimerMap[msg.id];
         let player = ct.initiativeArray[ct.initiativeIndex[0]].player;
-        if(player.running && emoji == PAUSE){
+        if(player.running && emoji == PAUSE.name){
             player.pause();
             reactionHandler.removeReactions([NEXT, PAUSE], msg);
             reactionHandler.addReactions([PLAY], msg);
-        } else if(!player.running && emoji == PLAY){
+        } else if(!player.running && emoji == PLAY.name){
             player.start();
             reactionHandler.removeReactions([PLAY], msg);
             reactionHandler.addReactions([NEXT, PAUSE], msg);

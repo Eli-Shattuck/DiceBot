@@ -1,0 +1,3 @@
+```
+𝑥 is the largest number on the die, it can be any integer between 1 and 10000.
+```

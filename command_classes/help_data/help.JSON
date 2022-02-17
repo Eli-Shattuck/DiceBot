@@ -1,0 +1,44 @@
+{ 
+    "pages": [
+        { 
+            "name":"",
+            "subpages":[],
+            "helpTextFileName":"./help.txt"
+        },
+        {
+            "name":"roll",
+            "subpages":["n", "x", "b", "flags", "special"],
+            "helpTextFileName":"./help_roll#.txt"
+        },
+        {
+            "name":"timer",
+            "subpages":[],
+            "helpTextFileName":"./help_timer.txt"
+        },
+        {
+            "name":"combat-timer",
+            "subpages":[],
+            "helpTextFileName":"./help_combat_timer.txt"
+        },
+        {
+            "name":"i love you",
+            "subpages":[],
+            "helpTextFileName":"./help_i_love_you.txt"
+        },
+        {
+            "name":"sudoku",
+            "subpages":[],
+            "helpTextFileName":"./help_sudoku.txt"
+        },
+        {
+            "name":"bazz",
+            "subpages":[],
+            "helpTextFileName":"./help_bazz.txt"
+        },
+        {
+            "name":"luis",
+            "subpages":[],
+            "helpTextFileName":"./help_luis.txt"
+        }
+    ]
+}

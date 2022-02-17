@@ -1,0 +1,10 @@
+```
+Command Format - 
+  --roll 𝑛 d 𝑥 [+/-] 𝑏 -flag0 arg0 -flag1 arg1...
+
+Try: --help roll n,
+     --help roll x,
+     --help roll b,
+     --help roll flags,
+	 --help roll special
+```

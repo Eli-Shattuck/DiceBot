@@ -39,8 +39,8 @@ class Cube{
         | o7 o8 o9 |
 +-------+-------+-------+
 | g1 g2 g3 | w1 w2 w3 | b1 b2 b3 |
-| g4 g5 g6 | w4 w5 w6 | b4 b5 b6 |
-| g7 g8 g9 | w7 w8 w9 | b7 b8 b9 |
+| g4 g5 g6 | w4 w5 w6 | b4 b5 b6 |    current scramble:
+| g7 g8 g9 | w7 w8 w9 | b7 b8 b9 |            #         
 +-------+-------+-------+
         | r1 r2 r3 |
         | r4 r5 r6 |
@@ -225,6 +225,50 @@ class Cube{
         mat[2][r] = row[2];
     }
 
+    scramble(scram) {
+        let prime = this.prime;
+        scram = scram.split(' ');
+        //console.log(scram);
+        for(let move of scram) {
+            let turn;
+            console.log(move, move[0], move[1]);
+            switch(move[0]) {
+                case 'F':
+                    turn = this.front.bind(this);
+                break;
+                case 'B':
+                    turn = this.back.bind(this);
+                break;
+                case 'U':
+                    turn = this.up.bind(this);
+                break;
+                case 'D':
+                    turn = this.down.bind(this);
+                break;
+                case 'L':
+                    turn = this.left.bind(this);
+                break;
+                case 'R':
+                    turn = this.right.bind(this);
+                break;
+            }
+            //console.log(turn);
+            
+            if(move[2] === "'") {
+                this.prime = true;
+                turn();
+            } else if(move[2] === "2") {
+                rc.prime = false;
+                turn();
+                turn();
+            } else {
+                rc.prime = false;
+                turn();
+            }
+        }
+        rc.prime = prime;
+    }
+
     toString() {
         let repr = '```\n' + Cube.getNet() + '\n```';
 
@@ -326,8 +370,9 @@ module.exports = class RubiksCubeCommand extends Command{
     }
 
     shuffle(reaction) {
-       let scram = scrambleGenerator.default({ turns: 30 });
-       
+        let rc = this.cubes[reaction.message.id];
+        rc.scramble(scrambleGenerator.default({ turns: 30 }).substring(1));
+        reaction.message.edit(rc.toString());
     }
 
     delete(reaction) {

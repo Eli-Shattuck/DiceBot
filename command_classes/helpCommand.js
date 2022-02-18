@@ -93,11 +93,18 @@ module.exports = class HelpCommand extends Command{
     }
 
     makeNice(text) {
-        return text
-        .replaceAll('\\t', '\u1CBC\u1CBC\u1CBC\u1CBC')
-        .replaceAll('*', '\\*')
-        .replaceAll('\\DiceBot', '🎲DiceBot🎲')
-        .replaceAll('\\it', '*');
+        //return text
+        let line1 = text.replaceAll('\\t', '\u1CBC\u1CBC\u1CBC\u1CBC');
+        let line2 = line1.replaceAll('*', '\\*');
+        let line3 = line2.replaceAll('\\DiceBot', '🎲DiceBot🎲');
+        let line4 = line3.replaceAll('\\it', '*');
+
+        console.log('tabs: ' + line1);
+        console.log('stars: ' + line2);
+        console.log('dicebots: ' + line3);
+        console.log('it: ' + line4);
+
+        return line4;
     }
 
     makeEmbed() {

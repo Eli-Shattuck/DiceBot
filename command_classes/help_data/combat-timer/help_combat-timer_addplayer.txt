@@ -1,0 +1,4 @@
+Adding a Player to an existing Combat Timer
+After a combat timer has been created, a player can be added. The player is added similiarly to how players are created initially, so a player with the same name and a different tag will get a new place in the initiative order with that tag. The full format is:
+```--combat-timer addplayer "name_tag" mins:secs```
+Where `tag` and `mins:secs` are optional, similar to entering a row. If a time is not given, a new player will recieve the default time used to create the timer.

@@ -9,6 +9,8 @@ const PLAY = UIEmojis.PLAY;
 const PAUSE = UIEmojis.PAUSE;
 const STOP = UIEmojis.STOP;
 const NEXT = UIEmojis.NEXT;
+const INCREASE = UIEmojis.INCREASE;
+const DECREASE = UIEmojis.DECREASE;
 
 class CTimer{
     constructor(message, title, creator){
@@ -137,6 +139,11 @@ module.exports = class CombatTimerCommand extends Command{
                 this.onPlayPause.bind(this)
             );
             reactionHandler.addCallback(
+                [INCREASE, DECREASE],
+                message,
+                this.onUpDown.bind(this)
+            );
+            reactionHandler.addCallback(
                 [NEXT],
                 message,
                 this.onNext.bind(this)
@@ -146,7 +153,7 @@ module.exports = class CombatTimerCommand extends Command{
                 message,
                 this.onStop.bind(this)
             );
-            reactionHandler.addReactions([STOP, PLAY], message);
+            reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
 		});
     }
 
@@ -177,13 +184,24 @@ module.exports = class CombatTimerCommand extends Command{
         reaction.users.remove(user.id); //remove the user's reaction so they can press next again
     }
 
-    onStop(reaction){
+    onUpDown(reaction, user){
         let msg = reaction.message;
         let combatTimer = this.combatTimerMap.get(msg.id);
+        if(user.id != combatTimer.initMessage.author.id) return;
+        combatTimer.players.forEach(element => {
+            element.increment *= -1; 
+        });
+        reactionHandler.toggleEmoji(INCREASE, DECREASE, reaction.message);
+    }
+
+    onStop(reaction, user){
+        let msg = reaction.message;
+        let combatTimer = this.combatTimerMap.get(msg.id);
+        if(user.id != combatTimer.initMessage.author.id) return;
         //permanently stops the timer and clears it from the combat timer map
         combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.stop();
         this.combatTimerMap.delete(msg.id);
-        reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP], msg);
+        reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP, INCREASE, DECREASE], msg);
         reactionHandler.removeAllCallbacks(msg);
     }
 }

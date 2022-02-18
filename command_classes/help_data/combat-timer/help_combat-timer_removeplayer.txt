@@ -1,4 +1,4 @@
 Removing a Player from an existing Combat Timer
 After creating a combat timer, you may want to remove a player, such as when a character dies. This can be done with the command:
 ```--combat-timer removeplayer "name_tag"```
-Where `tag` is optional. If a tag is given, all instances of that player with that tag in the initiative order will be removed. If a tag is not given, all instances of that player will be removed from the initiative order. This will not remove their timer.
+Where `tag` is optional. If a tag is given, all instances of that player with that tag in the initiative order will be removed. If a tag is not given, all instances of that player will be removed from the initiative order. This will not remove their timer. This can only be done by the creator.

@@ -14,15 +14,15 @@ class CTimer{
     constructor(message, title, creator){
         this.initMessage = message;
         this.sentMessage;
-        this.players = [];
-        this.initiativeArray = []; //array of initTokens
-        this.cTimerInfo = [
-            0,  //current index in initiative array
-            title,
-            creator,
-            0,  //default mins for a player
-            0,  //default secs for a player
-        ];
+        this.players = [];          //array of playerTimers
+        this.initiativeArray = [];  //array of initTokens
+        this.cTimerInfo = {
+            initiativeIndex: 0,     //current index in initiative array
+            title: title,
+            creator: creator,
+            defaultMins: 0,         //default mins for a player
+            defaultSecs: 0,         //default secs for a player
+        };
     }
 }
 
@@ -63,10 +63,12 @@ module.exports = class CombatTimerCommand extends Command{
         if(header && lines.length > 1) {
             this.initCombatTimer(msg, lines, header);
 		} else if(addPlayer){
-            let errmsg = EditPlayers.addPlayerCheck(msg, addPlayer, this.combatTimerMap);
+            let errmsg = EditPlayers.editPlayerCheck(msg, addPlayer, this.combatTimerMap, EditPlayers.addPlayer);
             if(errmsg) this.error(msg, errmsg);
         } else if(removePlayer){
-            EditPlayers.removePlayerCheck(msg, removePlayer, this.combatTimerMap);
+            let errmsg = EditPlayers.editPlayerCheck(msg, removePlayer, this.combatTimerMap, EditPlayers.removePlayer);
+            console.log(errmsg);
+            if(errmsg) this.error(msg, errmsg);
         } else{
 			this.error(msg, 'Your message does not match the expected format.');
 		}
@@ -74,11 +76,11 @@ module.exports = class CombatTimerCommand extends Command{
     }
 
     initCombatTimer(msg, lines, header){
-        let ct = new CTimer(msg, header[3], msg.author.username);
+        let combatTimer = new CTimer(msg, header[3], msg.author.username);
 
-        ct.cTimerInfo[3] = parseInt(header[1]); //default mins
-        ct.cTimerInfo[4] = parseInt(header[2]); //default secs
-        
+        combatTimer.cTimerInfo.defaultMins = parseInt(header[1]);
+        combatTimer.cTimerInfo.defaultSecs = parseInt(header[2]);
+        //set the default amount of time for a player in the combat timer
 		
 		for(let i = 1; i < lines.length; i++) {
 			let row = lines[i].match(CombatTimerCommand.getCTimerRePlayers());
@@ -94,11 +96,12 @@ module.exports = class CombatTimerCommand extends Command{
 			} else {
 				name_tag = [row[1], undefined];
 			}
-			let mins = row[3] ? parseInt(row[3]) : ct.cTimerInfo[3];
-            let secs = row[4] ? parseInt(row[4]) : ct.cTimerInfo[4];
-			
+			let mins = row[3] ? parseInt(row[3]) : combatTimer.cTimerInfo.defaultMins;
+            let secs = row[4] ? parseInt(row[4]) : combatTimer.cTimerInfo.defaultSecs;
+			//use the custom time for a player if there is one, otherwise use default time
+
             let curPlayer;
-			for(let player of ct.players){
+			for(let player of combatTimer.players){
                 if(player.user == name_tag[0]) {
                     let newTime = mins * 60 + secs;
                     if (newTime > player.time) player.time = newTime;
@@ -106,28 +109,27 @@ module.exports = class CombatTimerCommand extends Command{
                 }
             }
             if(curPlayer == undefined){ 
-                curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0]);
-                ct.players.push(curPlayer);
+                curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0], combatTimer);
+                combatTimer.players.push(curPlayer);
             }
             
             let token = new InitToken(row[2], curPlayer, name_tag[1]);
-            ct.initiativeArray.push(token);
+            combatTimer.initiativeArray.push(token);
         }
 
-		ct.initiativeArray.sort((a,b) => b.initiative - a.initiative);
-        ct.players.forEach(player => {
-            player.playerArray = ct.players;
-            player.initiativeArray = ct.initiativeArray;
-            player.cTimerInfo = ct.cTimerInfo;
-        });
+		combatTimer.initiativeArray.sort((a,b) => b.initiative - a.initiative);
+        // combatTimer.players.forEach(player => {
+        //     player.combatTimer = ct;
+        //     //give the player access to the info needed to edit the message with makeEmbed
+        // });
 		
-		let toSend = PlayerTimer.makeEmbed(ct.players, ct.initiativeArray, ct.cTimerInfo);			
+		let toSend = PlayerTimer.makeEmbed(combatTimer);			
 		
 		msg.channel.send(toSend)
 		.then(message => {
-			ct.players.forEach(player => player.message = message);
-            ct.sentMessage = message;
-            this.combatTimerMap.set(message.id, ct);
+			combatTimer.players.forEach(player => player.message = message);
+            combatTimer.sentMessage = message;
+            this.combatTimerMap.set(message.id, combatTimer);
 
             reactionHandler.addCallback(
                 [PLAY, PAUSE],
@@ -152,8 +154,8 @@ module.exports = class CombatTimerCommand extends Command{
         let msg = reaction.message;
         let emoji = reaction.emoji.name;
 
-        let ct = this.combatTimerMap.get(msg.id);
-        let player = ct.initiativeArray[ct.cTimerInfo[0]].player;
+        let combatTimer = this.combatTimerMap.get(msg.id);
+        let player = combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player;
         if(player.running && emoji == PAUSE.name){
             player.pause();
             reactionHandler.removeReactions([NEXT, PAUSE], msg);
@@ -167,19 +169,19 @@ module.exports = class CombatTimerCommand extends Command{
 
     onNext(reaction, user){
         let msg = reaction.message;
-        let ct = this.combatTimerMap.get(msg.id);
-
-        ct.initiativeArray[ct.cTimerInfo[0]].player.pause();
-        ct.cTimerInfo[0] = (ct.cTimerInfo[0] + 1) % ct.initiativeArray.length;
-        ct.initiativeArray[ct.cTimerInfo[0]].player.start();
-        reaction.users.remove(user.id);
+        let combatTimer = this.combatTimerMap.get(msg.id);
+        //stops the current player's timer, moves to next in initiative and starts their timer
+        combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.pause();
+        combatTimer.cTimerInfo.initiativeIndex = (combatTimer.cTimerInfo.initiativeIndex + 1) % combatTimer.initiativeArray.length; 
+        combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.start();
+        reaction.users.remove(user.id); //remove the user's reaction so they can press next again
     }
 
     onStop(reaction){
         let msg = reaction.message;
-        let ct = this.combatTimerMap.get(msg.id);
-
-        ct.initiativeArray[ct.cTimerInfo[0]].player.stop();
+        let combatTimer = this.combatTimerMap.get(msg.id);
+        //permanently stops the timer and clears it from the combat timer map
+        combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.stop();
         this.combatTimerMap.delete(msg.id);
         reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP], msg);
         reactionHandler.removeAllCallbacks(msg);

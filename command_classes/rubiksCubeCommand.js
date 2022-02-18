@@ -1,6 +1,7 @@
 const Command = require('./command.js');
 const reactionHandler = require('../io_classes/reactionHandler.js');
 const UIEmojis = require('../io_classes/uiEmojis.js');
+const scrambleGenerator = require('rubiks-cube-scramble');
 
 const startingUIElements = [
     UIEmojis.TRASH, UIEmojis.SHUFFLE, UIEmojis.UP, UIEmojis.DOWN, UIEmojis.FRONT, UIEmojis.BACK, UIEmojis.LEFT, UIEmojis.RIGHT, UIEmojis.CW
@@ -11,6 +12,13 @@ const turningUIElements = [
 const toggledUIElements = [
     UIEmojis.CW, UIEmojis.CCW
 ];
+
+const ORANGE = 0;
+const GREEN = 1;
+const WHITE = 2;
+const BLUE = 3;
+const RED = 4;
+const YELLOW = 5;
 
 class Cube{
     static getColor(i) {
@@ -56,43 +64,125 @@ class Cube{
             }
         }
 
-        this.faces[2] = [[0,1,2],[3,4,5],[6,7,8]];
+        //this.faces[5] = [[0,1,2],[3,4,5],[6,7,8]];
 
         this.prime = false;
         this.message;
     }
 
-    up() {
-        this.faces[2] = this.cycleMatrix(this.faces[2]);
-        if(!this.prime) {
-            let tmp = this.getRow(this.faces[0], 2);
-            this.setRow(this.faces[0], this.getCol(this.faces[1], 2), 2);
-            this.setCol(this.faces[1], this.getRow(this.faces[4], 0), 2);
-            this.setRow(this.faces[4], this.getCol(this.faces[3], 0), 0);
-            this.setCol(this.faces[3], tmp, 0);           
-        } else {
-
+    getFaceAbove(face) {
+        switch(face) {
+            case ORANGE:
+                return {face: YELLOW, rowCol: 3-1, set: this.setRow, get: this.getRow};
+            case GREEN:
+                return {face: ORANGE, rowCol: 0, set: this.setCol, get: this.getCol};
+            case WHITE:
+                return {face: ORANGE, rowCol: 3-1, set: this.setRow, get: this.getRow};
+            case BLUE:
+                return {face: ORANGE, rowCol: 3-1, set: this.setCol, get: this.getCol};
+            case RED:
+                return {face: WHITE, rowCol: 3-1, set: this.setRow, get: this.getRow};
+            case YELLOW:
+                return {face: RED, rowCol: 3-1, set: this.setRow, get: this.getRow};
         }
     }
 
+    getFaceBelow(face) {
+        switch(face) {
+            case ORANGE:
+                return {face: WHITE, rowCol: 0, set: this.setRow, get: this.getRow};
+            case GREEN:
+                return {face: RED, rowCol: 0, set: this.setCol, get: this.getCol};
+            case WHITE:
+                return {face: RED, rowCol: 0, set: this.setRow, get: this.getRow};
+            case BLUE:
+                return {face: RED, rowCol: 3-1, set: this.setCol, get: this.getCol};
+            case RED:
+                return {face: YELLOW, rowCol: 0, set: this.setRow, get: this.getRow};
+            case YELLOW:
+                return {face: ORANGE, rowCol: 0, set: this.setRow, get: this.getRow};
+        }
+    }
+
+    getFaceRight(face) {
+        switch(face) {
+            case ORANGE:
+                return {face: BLUE, rowCol: 0, set: this.setRow, get: this.getRow};
+            case GREEN:
+                return {face: WHITE, rowCol: 0, set: this.setCol, get: this.getCol};
+            case WHITE:
+                return {face: BLUE, rowCol: 0, set: this.setCol, get: this.getCol};
+            case BLUE:
+                return {face: YELLOW, rowCol: 3-1, set: this.setCol, get: this.getCol};
+            case RED:
+                return {face: BLUE, rowCol: 3-1, set: this.setRow, get: this.getRow};
+            case YELLOW:
+                return {face: BLUE, rowCol: 3-1, set: this.setCol, get: this.getCol};
+        }
+    }
+
+    getFaceLeft(face) {
+        switch(face) {
+            case ORANGE:
+                return {face: GREEN, rowCol: 0, set: this.setRow, get: this.getRow};
+            case GREEN:
+                return {face: YELLOW, rowCol: 0, set: this.setCol, get: this.getCol};
+            case WHITE:
+                return {face: GREEN, rowCol: 3-1, set: this.setCol, get: this.getCol};
+            case BLUE:
+                return {face: WHITE, rowCol: 3-1, set: this.setCol, get: this.getCol};
+            case RED:
+                return {face: GREEN, rowCol: 3-1, set: this.setRow, get: this.getRow};
+            case YELLOW:
+                return {face: GREEN, rowCol: 0, set: this.setCol, get: this.getCol};
+        }
+    }
+
+    rotateFace(face) {
+        this.faces[face] = this.cycleMatrix(this.faces[face]);
+        
+        let above = this.getFaceAbove(face);
+        let below = this.getFaceBelow(face);
+        let left  = this.getFaceLeft (face);
+        let right = this.getFaceRight(face);
+
+        let tmp = above.get(this.faces[above.face], above.rowCol);
+
+        if(!this.prime) {
+            above.set( this.faces[above.face],  left .get(this.faces[left .face], left .rowCol),  above.rowCol );
+            left .set( this.faces[left .face],  below.get(this.faces[below.face], below.rowCol),  left .rowCol );
+            below.set( this.faces[below.face],  right.get(this.faces[right.face], right.rowCol),  below.rowCol );
+            right.set( this.faces[right.face],  tmp                                            ,  right.rowCol );      
+        } else {
+            above.set( this.faces[above.face],  right.get(this.faces[right.face], right.rowCol),  above.rowCol );
+            right.set( this.faces[right.face],  below.get(this.faces[below.face], below.rowCol),  right.rowCol );
+            below.set( this.faces[below.face],  left .get(this.faces[left .face], left .rowCol),  below.rowCol );
+            left .set( this.faces[left .face],  tmp                                            ,  left .rowCol );         
+        }
+    }
+
+    up() {
+        this.rotateFace(WHITE);        
+    }
+
     down() {
-        console.log('down');
+        this.rotateFace(YELLOW);
     }
 
     left() {
-        console.log('left');
+        this.rotateFace(GREEN);
     }
 
     right() {
-        console.log('right');
+        this.rotateFace(BLUE);
     }
 
     front() {
-        console.log('front');
+        this.rotateFace(RED);
     }
 
     back() {
-        console.log('back');
+        this.rotateFace(ORANGE);
     }
 
     cycleMatrix(mat) {
@@ -117,22 +207,22 @@ class Cube{
         return newMat
     }
 
-    getCol(mat, r) {
-        return mat[r];
+    getCol(mat, c) {
+        return mat[c];
     }
 
-    getRow(mat, c) {
-        return [mat[0][c], mat[1][c], mat[2][c]]
+    getRow(mat, r) {
+        return [mat[0][r], mat[1][r], mat[2][r]]
     }
 
-    setCol(mat, row, r) {
-        mat[r] = row;
+    setCol(mat, col, c) {
+        mat[c] = col;
     }
 
-    setRow(mat, col, c) {
-        mat[0][c] = col[0];
-        mat[1][c] = col[1];
-        mat[2][c] = col[2];
+    setRow(mat, row, r) {
+        mat[0][r] = row[0];
+        mat[1][r] = row[1];
+        mat[2][r] = row[2];
     }
 
     toString() {
@@ -236,7 +326,8 @@ module.exports = class RubiksCubeCommand extends Command{
     }
 
     shuffle(reaction) {
-
+       let scram = scrambleGenerator.default({ turns: 30 });
+       
     }
 
     delete(reaction) {

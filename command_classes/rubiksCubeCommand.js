@@ -38,9 +38,9 @@ class Cube{
         | o4 o5 o6 |
         | o7 o8 o9 |
 +-------+-------+-------+
-| g1 g2 g3 | w1 w2 w3 | b1 b2 b3 |
-| g4 g5 g6 | w4 w5 w6 | b4 b5 b6 |    current scramble:
-| g7 g8 g9 | w7 w8 w9 | b7 b8 b9 |            #         
+| g1 g2 g3 | w1 w2 w3 | b1 b2 b3 |    current scramble:
+| g4 g5 g6 | w4 w5 w6 | b4 b5 b6 |    #1
+| g7 g8 g9 | w7 w8 w9 | b7 b8 b9 |    #2        
 +-------+-------+-------+
         | r1 r2 r3 |
         | r4 r5 r6 |
@@ -226,12 +226,13 @@ class Cube{
     }
 
     scramble(scram) {
+        this.scram = scram;
         let prime = this.prime;
         scram = scram.split(' ');
         //console.log(scram);
         for(let move of scram) {
             let turn;
-            console.log(move, move[0], move[1]);
+            //console.log(move, move[0], move[1]);
             switch(move[0]) {
                 case 'F':
                     turn = this.front.bind(this);
@@ -258,15 +259,15 @@ class Cube{
                 this.prime = true;
                 turn();
             } else if(move[2] === "2") {
-                rc.prime = false;
+                this.prime = false;
                 turn();
                 turn();
             } else {
-                rc.prime = false;
+                this.prime = false;
                 turn();
             }
         }
-        rc.prime = prime;
+        this.prime = prime;
     }
 
     toString() {
@@ -279,8 +280,11 @@ class Cube{
                 }
             }
         }
-
-        return repr;
+        let scram = this.scram ? this.scram : '';
+        let centerSpace = scram.indexOf(' ', scram.length/2);
+        let scram1 = scram.substring(0, centerSpace+1);
+        let scram2 = scram.substring(centerSpace+1);
+        return repr.replace('#1', scram1).replace('#2', scram2);
     }
 }
 
@@ -369,9 +373,10 @@ module.exports = class RubiksCubeCommand extends Command{
         reactionHandler.toggleEmoji(UIEmojis.CW, UIEmojis.CCW, reaction.message);
     }
 
-    shuffle(reaction) {
+    shuffle(reaction, user) {
+        reaction.users.remove(user.id);
         let rc = this.cubes[reaction.message.id];
-        rc.scramble(scrambleGenerator.default({ turns: 30 }).substring(1));
+        rc.scramble(scrambleGenerator.default({ turns: 5 }).substring(1));
         reaction.message.edit(rc.toString());
     }
 

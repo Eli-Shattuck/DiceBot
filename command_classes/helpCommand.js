@@ -75,14 +75,14 @@ module.exports = class HelpCommand extends Command{
         let overOrUnderflow = false;
 
         if(this.pageIndex >= this.chapters[this.chapterIndex].pages.length || this.pageIndex < 0) {
-            this.pageIndex = 0;
-            
             this.chapterIndex += scrollDirection;
             if(this.chapterIndex >= this.chapters.length) {
                 this.chapterIndex = 0;
             } else if (this.chapterIndex < 0) {
                 this.chapterIndex = this.chapters.length-1;
             }
+            if(scrollDirection > 0) this.pageIndex = 0;
+            else this.pageIndex = this.chapters[this.chapterIndex].pages.length - 1;
         }
 
         msg.edit(
@@ -94,17 +94,10 @@ module.exports = class HelpCommand extends Command{
 
     makeNice(text) {
         //return text
-        let line1 = text.replaceAll('\\t', '\u1CBC\u1CBC\u1CBC\u1CBC');
-        let line2 = line1.replaceAll('*', '\\*');
-        let line3 = line2.replaceAll('\\DiceBot', '🎲DiceBot🎲');
-        let line4 = line3.replaceAll('\\it', '*');
-
-        console.log('tabs: ' + line1);
-        console.log('stars: ' + line2);
-        console.log('dicebots: ' + line3);
-        console.log('it: ' + line4);
-
-        return line4;
+        return text.replaceAll('\\t', '\u1CBC\u1CBC\u1CBC\u1CBC')
+        .replaceAll('*', '\\*')
+        .replaceAll('\\DiceBot', '🎲DiceBot🎲')
+        .replaceAll('\\it', '*')
     }
 
     makeEmbed() {

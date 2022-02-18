@@ -1,0 +1,6 @@
+The Most Beautiful Man We Know
+```
+BAZZ   BAZZ   BAZZ   BAZZ   BAZZ   BAZZ   BAZZ 
+```
+The `--bazz` command allows you to get a peek at a collection of the greatests sights known to man. \DiceBot has been given the honor of sharing these with you by sending you all 20 photos of Bazz in glorious, \itsometimes\it-high definition.
+Each picture is labeled with a number, corresponding to a die value when the `-bazz` flag is used with the `--roll` command. 

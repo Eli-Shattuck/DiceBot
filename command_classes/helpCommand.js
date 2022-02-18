@@ -96,7 +96,8 @@ module.exports = class HelpCommand extends Command{
         return text
         .replaceAll('\\t', '\u1CBC\u1CBC\u1CBC\u1CBC')
         .replaceAll('*', '\\*')
-        .replaceAll('\\DiceBot', '🎲DiceBot🎲');
+        .replaceAll('\\DiceBot', '🎲DiceBot🎲')
+        .replaceAll('\\it', '*');
     }
 
     makeEmbed() {

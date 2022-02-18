@@ -3,42 +3,42 @@
         { 
             "name":"welcome page",
             "pages":[""],
-            "helpTextFileName":"help#.txt"
+            "helpTextFileName":"general/help#.txt"
         },
         {
             "name":"roll",
             "pages":["", "n", "x", "b", "flags", "flags(cont)", "special"],
-            "helpTextFileName":"help_roll_#.txt"
+            "helpTextFileName":"roll/help_roll_#.txt"
         },
         {
             "name":"timer",
             "pages":[""],
-            "helpTextFileName":"help_timer_#.txt"
+            "helpTextFileName":"timer/help_timer_#.txt"
         },
         {
             "name":"combat-timer",
             "pages":[""],
-            "helpTextFileName":"help_combat_timer_#.txt"
+            "helpTextFileName":"combat-timer/help_combat_timer_#.txt"
         },
         {
             "name":"i love you",
             "pages":[""],
-            "helpTextFileName":"help_i_love_you_#.txt"
+            "helpTextFileName":"i_love_you/help_i_love_you_#.txt"
         },
         {
             "name":"sudoku",
             "pages":[""],
-            "helpTextFileName":"help_sudoku_#.txt"
+            "helpTextFileName":"sudoku/help_sudoku_#.txt"
         },
         {
             "name":"bazz",
             "pages":[""],
-            "helpTextFileName":"help_bazz_#.txt"
+            "helpTextFileName":"bazz/help_bazz_#.txt"
         },
         {
             "name":"luis",
             "pages":[""],
-            "helpTextFileName":"help_luis_#.txt"
+            "helpTextFileName":"luis/help_luis_#.txt"
         }
     ]
 }

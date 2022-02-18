@@ -1,0 +1,15 @@
+The Roll Command!
+```
+More Flags-
+    *	-chist
+		takes three arguments 𝓁, 𝑠, and 𝘱, and includes a simple histogram, the maximum width of a bar is 𝓁, the character or string used to represent the bar is 𝑠, and 𝘱 determines if the roll values are printed 
+        𝓁 and 𝘱 are integers where 0 <= 𝓁 <= 100, and 0 <= 𝘱 <= 1. 𝑠 is any sequence of characters containing no whitespace
+    *	-hist
+		takes no arguments, includes a simple histogram of the rolled values after the rolls (equivalent to -chist 20 = 0)
+    *	-pick
+		takes one argument, 𝘱, and returns the 𝘱 largest rolls
+        𝘱 is an integer where 0 <= 𝘱 <= 10000
+    * 	-loop
+		takes one argument, 𝓁, and runs the command 𝓁 times
+        𝓁 is an integer where 0 <= 𝓁 <= 100
+```

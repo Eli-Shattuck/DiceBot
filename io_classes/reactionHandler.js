@@ -1,33 +1,34 @@
 let callbacks = new Map();
 module.exports = {
     onReaction: (reaction, user) => {
-        if(callbacks[reaction.message.id] && callbacks[reaction.message.id][reaction.emoji.identifier]) {
+        if(callbacks.has(reaction.message.id) && callbacks.get(reaction.message.id).has(reaction.emoji.identifier)) {
             //console.log(reaction.emoji.identifier, callbacks[reaction.message.id]);
             //console.log(callbacks[reaction.message.id][reaction.emoji.identifier]);
-            callbacks[reaction.message.id][reaction.emoji.identifier](reaction, user);
+            callbacks.get(reaction.message.id).get(reaction.emoji.identifier) (reaction, user);
         }
     },
 
     addCallback: (emojiObjects, message, callback) => {
         for(let emoji of emojiObjects) {
-            if(!callbacks[message.id]) {
-                callbacks[message.id] = new Map();
+            if(!callbacks.has(message.id)) {
+                callbacks.set(message.id, new Map());
             }
-            callbacks[message.id][emoji.toString()] = callback;
+            callbacks.get(message.id).set(emoji.toString(), callback);
         }
     },
 
     removeCallback: (emojiIdentifiers, message) => {
         for(let emoji of emojiIdentifiers) {
-            if(callbacks[message.id] && callbacks[message.id][emoji]) {
-                callbacks[message.id].delete(emoji);
+            if(callbacks.has(message.id) && callbacks.get(message.id).has(emoji)) {
+                callbacks.get(message.id).delete(emoji);
             }
         }
     },
 
     removeAllCallbacks: (message) => {
-        if(callbacks[message.id]) {
+        if(callbacks.has(message.id)) {
             callbacks.delete(message.id);
+            //callbacks[message.id] = undefined;
         }
     },
 

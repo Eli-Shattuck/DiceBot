@@ -2,23 +2,18 @@ const Timer = require('./timer.js');
 const Discord = require('discord.js');
 
 module.exports = class PlayerTimer extends Timer{
-    constructor(mins, secs, initMessage, user, title, creator){
+    constructor(mins, secs, initMessage, user){
         super(mins, secs, initMessage, user);
-        this.selected = false;
-        this.title = title;
-        this.creator = creator;
         this.playerArray;
         this.initiativeArray;
-        this.initiativeIndex;
+        this.cTimerInfo;
     }
 
     start() {
-		this.selected = true;
 		super.start();
 	}
 	
 	pause(prefix) {
-		this.selected = false;
 		super.pause(prefix);
 	}
 
@@ -28,15 +23,15 @@ module.exports = class PlayerTimer extends Timer{
 
     editMessage(prefix) {
         this.message.edit(
-            PlayerTimer.makeEmbed(this.title, this.creator, this.playerArray, this.initiativeArray, this.initiativeIndex)
+            PlayerTimer.makeEmbed(this.playerArray, this.initiativeArray, this.cTimerInfo)
         );
     }
 
-    static makeEmbed(title, username, players, initiativeArray, initiativeIndex) {
+    static makeEmbed(players, initiativeArray, cTimerInfo) {
         let messageEmbed =  new Discord.MessageEmbed()
             .setColor('#fc80a2')
-            .setTitle(title)
-            .setAuthor(`Creator: ${username}`)
+            .setTitle(cTimerInfo[1])
+            .setAuthor(`Creator: ${cTimerInfo[2]}`)
             .setDescription('Combat Timer!')
             .setThumbnail('https://cdn-icons-png.flaticon.com/512/2784/2784459.png')
 
@@ -46,9 +41,9 @@ module.exports = class PlayerTimer extends Timer{
             messageEmbed.addField('```' + player.user + '```', timeString, false);
         }
         
-        let currName = PlayerTimer.get(initiativeIndex[0], initiativeArray);
-        let deckName = PlayerTimer.get(initiativeIndex[0]+1, initiativeArray);
-        let deckDeckName = PlayerTimer.get(initiativeIndex[0]+2, initiativeArray);
+        let currName = PlayerTimer.get(cTimerInfo[0], initiativeArray);
+        let deckName = PlayerTimer.get(cTimerInfo[0]+1, initiativeArray);
+        let deckDeckName = PlayerTimer.get(cTimerInfo[0]+2, initiativeArray);
         
         messageEmbed.addFields(
                 { name: '\u200B', value: '\u200B' },

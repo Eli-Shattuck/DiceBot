@@ -1,11 +1,11 @@
-Welcome to DiceBot!
-DiceBot is a table top RPG bot the is mainly used to roll dice. DiceBot can do many other things though, so make sure to look around in these help pages!
+Welcome to \DiceBot!
+DiceBot is a table top RPG bot that is mainly used to roll dice. DiceBot can do many other things though, so make sure to look around in these help pages!
 To explore what DiceBot can do either hit the left and right arrows below this message or type `--help` followed by
-    `roll`
-    `timer`
-    `combat-timer`
-    `i love you`
-    `sudoku`
-    `bazz`
-    `luis`
+\t* `roll`
+\t* `timer`
+\t* `combat-timer`
+\t* `i love you`
+\t* `sudoku`
+\t* `bazz`
+\t* `luis`
 I hope you enjoy all the wonderful things DiceBot can do!

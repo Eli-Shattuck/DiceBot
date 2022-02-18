@@ -1,44 +1,44 @@
 { 
-    "pages": [
+    "chapters": [
         { 
-            "name":"",
-            "subpages":[],
-            "helpTextFileName":"./help.txt"
+            "name":"welcome page",
+            "pages":[""],
+            "helpTextFileName":"help#.txt"
         },
         {
             "name":"roll",
-            "subpages":["n", "x", "b", "flags", "special"],
-            "helpTextFileName":"./help_roll#.txt"
+            "pages":["", "n", "x", "b", "flags", "flags(cont)", "special"],
+            "helpTextFileName":"help_roll_#.txt"
         },
         {
             "name":"timer",
-            "subpages":[],
-            "helpTextFileName":"./help_timer.txt"
+            "pages":[""],
+            "helpTextFileName":"help_timer_#.txt"
         },
         {
             "name":"combat-timer",
-            "subpages":[],
-            "helpTextFileName":"./help_combat_timer.txt"
+            "pages":[""],
+            "helpTextFileName":"help_combat_timer_#.txt"
         },
         {
             "name":"i love you",
-            "subpages":[],
-            "helpTextFileName":"./help_i_love_you.txt"
+            "pages":[""],
+            "helpTextFileName":"help_i_love_you_#.txt"
         },
         {
             "name":"sudoku",
-            "subpages":[],
-            "helpTextFileName":"./help_sudoku.txt"
+            "pages":[""],
+            "helpTextFileName":"help_sudoku_#.txt"
         },
         {
             "name":"bazz",
-            "subpages":[],
-            "helpTextFileName":"./help_bazz.txt"
+            "pages":[""],
+            "helpTextFileName":"help_bazz_#.txt"
         },
         {
             "name":"luis",
-            "subpages":[],
-            "helpTextFileName":"./help_luis.txt"
+            "pages":[""],
+            "helpTextFileName":"help_luis_#.txt"
         }
     ]
 }

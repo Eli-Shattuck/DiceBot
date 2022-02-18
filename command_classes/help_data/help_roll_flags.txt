@@ -1,0 +1,15 @@
+The Roll Command!
+```
+Flags-
+	*	-adv
+		takes no arguments, rolls each die twice and picks the maximum value.
+	*	-dis
+		takes no arguments, rolls each die twice and picks the minimum value.
+	*	-sum
+		takes no arguments, returns the sum of all values rolled (after picking if a -pick is specified)
+    *	-sort
+		takes no arguments, returns the rolls in decreasing sorted order
+    *	-isort (increasing sort)
+		takes no arguments, returns the rolls in increasing sorted order
+```
+Type `--help flags(cont)` to see more flags!

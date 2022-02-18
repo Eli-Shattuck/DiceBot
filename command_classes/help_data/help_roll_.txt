@@ -1,0 +1,11 @@
+The Roll Command!
+Command Format - 
+```
+  --roll 𝑛 d 𝑥 [+/-] 𝑏 -flag0 arg0 -flag1 arg1...
+```
+Try: 
+\t* `--help roll n`,
+\t* `--help roll x`,
+\t* `--help roll b`,
+\t* `--help roll flags`,
+\t* `--help roll special`

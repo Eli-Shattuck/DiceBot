@@ -1,0 +1,16 @@
+Special commands
+```
+Aliases-
+	*	--roll char
+		alias for '--roll 4d6 -pick 3 -loop 6 -sum', used to generate 6 stats for a character
+	*	--roll stat
+		alias for '--roll 4d6 -pick 3 -sum', used to generate a single stat for a character
+	*	'--roll nice'
+		alias for '--roll 69d69 -adv', *cough* *cough* ⁿᶦᶜᵉ *cough* *cough*
+	*	'--roll bazz'
+		alias for '--roll 1d20 -bazz
+
+Special flags-
+    *   -bazz
+        instead of returning the dice rolls as integers, if the -bazz flag is included your rolls will be returned as labeled pictures of my friend Bazz.
+```

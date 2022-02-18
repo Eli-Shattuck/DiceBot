@@ -1,0 +1,5 @@
+Argument: 𝑏
+```
+𝑏 is the value to add to each roll, it can be any integer between -10000 and 10000.
+Note: to use negative integers you must subtract positive integers (i.e. --roll 2d10 - 1), as opposed to adding a negative (i.e. --roll 3d12 + -2)
+```

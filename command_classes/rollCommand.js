@@ -7,6 +7,7 @@ const alieses = {
     '--roll char' : '--roll 4d6 -pick 3 -loop 6 -sum',
     '--roll stat' : '--roll 4d6 -pick 3 -sum',
     '--roll nice' : '--roll 69d69 -sort -pick 1',
+    '--roll bazz' : '--roll 1d20 -bazz',
 }
 
 //command in form: --roll 𝑛 d 𝑥 [+/-] 𝑏 -flag0 arg0 -flag1 arg1…

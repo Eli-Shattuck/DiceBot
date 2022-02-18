@@ -1,0 +1,5 @@
+Argument: 𝑛
+```
+𝑛 is the number of dice to roll; it can be any integer between 0 and 10000.
+Note: 𝑛 is optional and is assumed to be 1 if it is ommited (i.e --roll 1d20 is the same as --roll d20).
+```

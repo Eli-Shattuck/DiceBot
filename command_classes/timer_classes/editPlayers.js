@@ -94,19 +94,24 @@ module.exports = class EditPlayers{
 
         let initialLength = combatTimer.initiativeArray.length;
         if(name_tag[1]){
-            //if there is a tag, only remove instances of that tag from the initiativeArray
-            combatTimer.initiativeArray = combatTimer.initiativeArray.filter(element => element.tag != name_tag[1])
+            //if there is a tag, only remove instances of that player with that tag from the initiativeArray
+            combatTimer.initiativeArray = combatTimer.initiativeArray.filter(
+                element => element.tag != name_tag[1] || element.player.user != name_tag[0]
+                );
         } else {
-            //remove all instances of the player from initiativeArray and remove them from the player array
-            combatTimer.initiativeArray = combatTimer.initiativeArray.filter(element => element.player.user != name_tag[0]);
-            combatTimer.players = combatTimer.players.filter(element => element.user != name_tag[0]);
+            //remove all instances of the player from initiativeArray
+            combatTimer.initiativeArray = combatTimer.initiativeArray.filter(
+                element => element.player.user != name_tag[0]
+                );
+            //this keeps their timer, but it could be removed with this line:
+                //combatTimer.players = combatTimer.players.filter(element => element.user != name_tag[0]);
         }
-        console.log(initialLength, combatTimer.initiativeArray.length);
-        console.log(initialLength === combatTimer.initiativeArray.length);
+
         if(combatTimer.initiativeArray.length === initialLength){
             msg.reply(`Player "${info[1]}" was not found in the combat timer.`);
             return;
         }
+
         combatTimer.sentMessage.edit(
             PlayerTimer.makeEmbed(combatTimer)
         );

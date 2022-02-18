@@ -1,0 +1,6 @@
+Welcome to Combat-Timer!
+The `--combat-timer` command allows you to create a "chess clock" for any number of people. This means that it will have a timer for each player. If a timer is running, the :next: emoji, picturing two arrows to the right, can be used to stop the current timer and start the timer of the next player. This sequence will loop.
+
+This was designed for DnD and other ttrpgs, so the command will take in a number that represents a player's initiative, or priority, and order the sequence according to these. A player can be added multiple times in the rotation, so a game master can control multiple enemies with different places in the sequence.
+
+Continue to the next page or type `--help combat-timer contents` to learn how to use it!

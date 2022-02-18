@@ -1,0 +1,16 @@
+The Combat Timer Command!
+Command Format - 
+```
+  --combat-timer min:sec exampleTitle
+  "name1" initiative1 newMin:newSec
+  "name2" initiative2 
+  "name3_tag" initiative3 newMin:newSec
+  \t\t.
+  \t\t.
+  \t\t.
+```
+Try: 
+\t* `--help combat-timer header`,
+\t* `--help combat-timer rows`,
+\t* `--help combat-timer example`,
+\t* `--help combat-timer ui`,

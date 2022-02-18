@@ -4,7 +4,7 @@ To explore what DiceBot can do either hit the left and right arrows below this m
 \t* `roll`
 \t* `timer`
 \t* `combat-timer`
-\t* `i love you`
+\t* `love`
 \t* `sudoku`
 \t* `bazz`
 \t* `luis`

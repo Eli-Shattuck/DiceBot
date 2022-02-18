@@ -1,3 +1,6 @@
-```
-luis
-```
+The Luis Command
+Luis hates showing affection, so he asked us to let \DiceBot do it for him. Typing `--luis` will give \DiceBot the chance to say I love you to a random user who has been recently active in that channel. However, \DiceBot is kind enough to give credit to this show of affection to this Luis guy, I guess.
+
+
+
+Whatever

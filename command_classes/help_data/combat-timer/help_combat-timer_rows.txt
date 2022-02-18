@@ -1,0 +1,9 @@
+Indroduction to Using Combat-Timer:  The Rows
+After entering the first line of the command (see `--help combat-timer header`), the rest of the call to the command is made up of rows.
+There can be any number of rows, and they each have the same format:
+```"name_tag" initiative mins:secs```
+Let's discuss each part:
+\t*`name_tag` is used to enter the display name of a player. It must be surrounded by quotes, and gives two parts: `name` and `tag` that must be separated by an underscore ('_').
+\t*`name`: The timer will be displayed with `name`. Each player will have only one name. Adding another player with the same name will add them to the initiative order again, but will not create an additional timer.
+
+Continue to the next page or type `--help combat-timer rows(cont)` to see the other parts.

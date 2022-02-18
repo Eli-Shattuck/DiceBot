@@ -1,0 +1,7 @@
+Indroduction to Using Combat-Timer:  The Rows (continued)
+```"name_tag" initiative mins:secs```
+\t*`tag`: This will be displayed in the form of 'name: tag' when showing what players are up next. A player that is added multiple times can be added with different tags to differentiate between which instance of that player is up.
+\t*`initiative`: This is an integer representing a player's priority in the timer order. Players with larger initiative values will go before those with lower values. If two players have the same initiative, the one entered first will go first.
+\t*`mins:secs`: This takes in two numbers representing the amount of time a player will get. This part is optional, and a player's time will be set as the default time given in the header if this is not present.
+
+Continue to the next page or type `--help combat-timer example` to see a full example.

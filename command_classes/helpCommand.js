@@ -107,9 +107,11 @@ module.exports = class HelpCommand extends Command{
 
         let helpText;
         try {
+            //console.log('./command_classes/help_data/'+chapter.helpTextFileName.replace('#', page));
             helpText = this.fs.readFileSync('./command_classes/help_data/'+chapter.helpTextFileName.replace('#', page), 'utf8')
+            //console.log(helpText);
             helpText = this.makeNice(helpText);
-            //console.log(helpText)
+            //console.log(helpText);
         } catch (err) {
             console.error(err)
         }

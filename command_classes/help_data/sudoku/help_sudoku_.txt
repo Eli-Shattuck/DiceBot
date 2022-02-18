@@ -1,3 +1,13 @@
+The Sudoku Command!
+Command Format - 
 ```
-sudoku
+  --sudoku
+  num_{1,1} num_{1,2} ... num_{1,9}
+  num_{2,1} num_{2,2} ... num_{2,9}
+                       .
+                       .
+                       .
+  num_{9,1} num_{9,2} ... num_{9,9}
 ```
+Sudoku takes in a 9x9 grid of single digits separated by spaces and newlines, and returns a valid solution if one exists. Use 0 to represent emty cells
+NOTE: this uses a brute force algorithm. So for boards with many zeros, but no solutions, it may run very slowly and even kill \DiceBot! :(

@@ -1,3 +1,12 @@
+The Timer Command!
+Command Format - 
 ```
-timer
+  --timer mins:secs
 ```
+The `--timer` command creates a timer that starts at the given time. It has a few controls in the form of reactions that it provides:
+
+\t*`PLAY`: Starts the timer
+\t*`PAUSE`: Pauses the timer
+\t*`UP`: When pressed, changes from increasing to decreasing
+\t*`DOWN`: When pressed, changes from decreasing to increasing
+\t*`X`: Permanently stops the timer

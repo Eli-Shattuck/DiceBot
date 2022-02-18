@@ -9,4 +9,5 @@ module.exports = [
     new (require('./timer_classes/combatTimerCommand.js'))(),
     new (require('./luisCommand.js'))(),
     new (require('./helpCommand.js'))(),
+    new (require('./rubiksCubeCommand.js'))(),
 ]

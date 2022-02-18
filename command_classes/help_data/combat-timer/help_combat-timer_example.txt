@@ -1,0 +1,14 @@
+Example of a Full Combat Timer
+```
+--combat-timer 6:30 The Rat Fight
+"Julia" 17
+"Bazz" 13
+"Eli" 12
+"Luis" 18
+"Dan" 9
+"Nick" 14
+"Tim_Rat 1" 7 20:00
+"Tim_Rat 2" 14
+"Tim_Rat King" 11
+```
+This command creates a combat timer where each player except for Tim has 6 minutes and 30 seconds on their clock. Tim has 20 minutes, and will come up in the rotation three times, each appearing with a different tag so he knows what creature to play.

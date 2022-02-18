@@ -1,0 +1,7 @@
+Indroduction to Using Combat-Timer:  The Header
+The `--combat timer` command is made in two parts: the header and the rows.
+The header contains `--combat-timer` and two important arguments. The first is the default time given to each player. This can be overwritten as players are entered in the rows. The second argument is the title of the timer. For example:
+```--combat-timer 10:00 Game Night!```
+Using this as the first line to call the command will create a combat timer (if you have rows)  with a default time of 10 minutes for each player, and the timer will be titled "Game Night!".
+
+Continue to the next page or type `--help combat-timer rows` to learn about the rows!

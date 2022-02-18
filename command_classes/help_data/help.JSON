@@ -17,11 +17,11 @@
         },
         {
             "name":"combat-timer",
-            "pages":[""],
-            "helpTextFileName":"combat-timer/help_combat_timer_#.txt"
+            "pages":["", "contents", "header", "rows", "rows(cont)", "example", "ui"],
+            "helpTextFileName":"combat-timer/help_combat-timer_#.txt"
         },
         {
-            "name":"i love you",
+            "name":"love",
             "pages":[""],
             "helpTextFileName":"i_love_you/help_i_love_you_#.txt"
         },

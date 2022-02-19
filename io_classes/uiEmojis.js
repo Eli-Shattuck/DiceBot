@@ -15,8 +15,11 @@ class UIEmoji {
         //console.log(this.toString());
     }
 
+    toTextString() {
+        return `<:${this.name}:${this.id}>`;
+    }
+
     toString() {
-        //return `<:${this.name}:${this.id}>`;
         return `${this.name}:${this.id}`;
     }
 }
@@ -39,6 +42,9 @@ const UP       = new UIEmoji("turn_up",     "944089662471962675");
 const SHUFFLE  = new UIEmoji("shuffle",     "944092077053055026");
 const CW       = new UIEmoji("cw",          "944090981689614358");
 const CCW      = new UIEmoji("ccw",         "944090981567967282");
+const SORT     = new UIEmoji("sort",        "944433668557000804");
+
+const TRANS    = new UIEmoji("ts",          "944421824677179472");
 
 const ZERO     = new UIEmoji("label_zero",  "944050179634503751");
 const ONE      = new UIEmoji("label_one",   "944050179504480259");
@@ -55,5 +61,6 @@ module.exports = {
     PLAY, PAUSE, NEXT, PREVIOUS, INCREASE, DECREASE, STOP, TRASH,
     ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE,
     NUMS: [ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE],
-    BACK, DOWN, FRONT, LEFT, RIGHT, UP, SHUFFLE, CW, CCW    
+    BACK, DOWN, FRONT, LEFT, RIGHT, UP, SHUFFLE, CW, CCW, SORT,
+    TRANS
 };

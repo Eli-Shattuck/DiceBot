@@ -4,7 +4,7 @@ const UIEmojis = require('../io_classes/uiEmojis.js');
 const scrambleGenerator = require('rubiks-cube-scramble');
 
 const startingUIElements = [
-    UIEmojis.TRASH, UIEmojis.SHUFFLE, UIEmojis.UP, UIEmojis.DOWN, UIEmojis.FRONT, UIEmojis.BACK, UIEmojis.LEFT, UIEmojis.RIGHT, UIEmojis.CW
+    UIEmojis.TRASH, UIEmojis.SHUFFLE, UIEmojis.SORT, UIEmojis.UP, UIEmojis.DOWN, UIEmojis.FRONT, UIEmojis.BACK, UIEmojis.LEFT, UIEmojis.RIGHT, UIEmojis.CW
 ];
 const turningUIElements = [
     UIEmojis.UP, UIEmojis.DOWN, UIEmojis.FRONT, UIEmojis.BACK, UIEmojis.LEFT, UIEmojis.RIGHT
@@ -21,7 +21,7 @@ const RED = 4;
 const YELLOW = 5;
 
 class Cube{
-    static getColor(i) {
+    static getColorName(i) {
         return [
             'o',
             'g',
@@ -30,26 +30,66 @@ class Cube{
             'r',
             'y'
         ][i];
+    } 
+
+    static getColor(i) {
+        return [
+            '🟧',
+            '🟩',
+            '⬜',
+            '🟦',
+            '🟥',
+            '🟨'
+        ][i];
     }
 
     static getNet() {
-        return `        +-------+
-        | o1 o2 o3 |
-        | o4 o5 o6 |
-        | o7 o8 o9 |
-+-------+-------+-------+
-| g1 g2 g3 | w1 w2 w3 | b1 b2 b3 |    current scramble:
-| g4 g5 g6 | w4 w5 w6 | b4 b5 b6 |    #1
-| g7 g8 g9 | w7 w8 w9 | b7 b8 b9 |    #2        
-+-------+-------+-------+
-        | r1 r2 r3 |
-        | r4 r5 r6 |
-        | r7 r8 r9 |
-        +-------+
-        | y1 y2 y3 |
-        | y4 y5 y6 |
-        | y7 y8 y9 |
-        +-------+`;
+//         return `        +-------+
+//         | o1 o2 o3 |
+//         | o4 o5 o6 |
+//         | o7 o8 o9 |
+// +-------+-------+-------+
+// | g1 g2 g3 | w1 w2 w3 | b1 b2 b3 |    current scramble:
+// | g4 g5 g6 | w4 w5 w6 | b4 b5 b6 |    #1
+// | g7 g8 g9 | w7 w8 w9 | b7 b8 b9 |    #2        
+// +-------+-------+-------+
+//         | r1 r2 r3 |
+//         | r4 r5 r6 |
+//         | r7 r8 r9 |
+//         +-------+
+//         | y1 y2 y3 |
+//         | y4 y5 y6 |
+//         | y7 y8 y9 |
+//         +-------+`;
+// return `.....$$$$$
+// .....$o1o2o3$
+// .....$o4o5o6$
+// .....$o7o8o9$
+// .$$$$$$$$$$$$$
+// .$g1g2g3$w1w2w3$b1b2b3$ current scramble:
+// .$g4g5g6$w4w5w6$b4b5b6$ #1
+// .$g7g8g9$w7w8w9$b7b8b9$ #2        
+// .$$$$$$$$$$$$$
+// .....$r1r2r3$
+// .....$r4r5r6$
+// .....$r7r8r9$
+// .....$$$$$
+// .....$y1y2y3$
+// .....$y4y5y6$
+// .....$y7y8y9$
+// .....$$$$$`;
+return `....o1o2o3
+....o4o5o6
+....o7o8o9
+.g1g2g3w1w2w3b1b2b3..current scramble:
+.g4g5g6w4w5w6b4b5b6..#1
+.g7g8g9w7w8w9b7b8b9..#2        
+....r1r2r3$
+....r4r5r6$
+....r7r8r9$
+....y1y2y3$
+....y4y5y6$
+....y7y8y9$`;
     }
 
     constructor() {
@@ -68,6 +108,17 @@ class Cube{
 
         this.prime = false;
         this.message;
+    }
+
+    reset() {
+        for(let i = 0; i < 6; i++) {
+            for(let j = 0; j < 3; j++) {
+                for(let k = 0; k < 3; k++) {
+                    this.faces[i][j][k] = Cube.getColor(i);
+                }
+            }
+        }
+        this.scram = '';
     }
 
     getFaceAbove(face) {
@@ -255,10 +306,11 @@ class Cube{
             }
             //console.log(turn);
             
-            if(move[2] === "'") {
+            if(move[1] === "'") {
                 this.prime = true;
                 turn();
-            } else if(move[2] === "2") {
+            } else if(move[1] === "2") {
+                //console.log(move[2]);
                 this.prime = false;
                 turn();
                 turn();
@@ -271,20 +323,27 @@ class Cube{
     }
 
     toString() {
-        let repr = '```\n' + Cube.getNet() + '\n```';
+        //let repr = '```\n' + Cube.getNet() + '\n```';
+        let repr = Cube.getNet();
 
         for(let i = 0; i < 6; i++) {
             for(let j = 0; j < 3; j++) {
                 for(let k = 0; k < 3; k++) {
-                    repr = repr.replace(Cube.getColor(i) + (j+3*k+1), this.faces[i][j][k]);
+                    repr = repr.replace(Cube.getColorName(i) + (j+3*k+1), this.faces[i][j][k]);
                 }
             }
         }
+
+        repr = repr.replaceAll('.', UIEmojis.TRANS.toTextString());
+        repr = repr.replaceAll('$', '⬛');
+
         let scram = this.scram ? this.scram : '';
         let centerSpace = scram.indexOf(' ', scram.length/2);
         let scram1 = scram.substring(0, centerSpace+1);
         let scram2 = scram.substring(centerSpace+1);
-        return repr.replace('#1', scram1).replace('#2', scram2);
+        repr = repr.replace('#1', scram1).replace('#2', scram2);
+        console.log(repr.length);
+        return repr;
     }
 }
 
@@ -324,6 +383,12 @@ module.exports = class RubiksCubeCommand extends Command{
                 [UIEmojis.SHUFFLE],
                 message,
                 this.shuffle.bind(this)
+            );
+
+            reactionHandler.addCallback(
+                [UIEmojis.SORT],
+                message,
+                this.sort.bind(this)
             );
 
             reactionHandler.addCallback(
@@ -376,7 +441,14 @@ module.exports = class RubiksCubeCommand extends Command{
     shuffle(reaction, user) {
         reaction.users.remove(user.id);
         let rc = this.cubes[reaction.message.id];
-        rc.scramble(scrambleGenerator.default({ turns: 5 }).substring(1));
+        rc.scramble(scrambleGenerator.default({ turns: 30 }).substring(1));
+        reaction.message.edit(rc.toString());
+    }
+
+    sort(reaction, user) {
+        reaction.users.remove(user.id);
+        let rc = this.cubes[reaction.message.id];
+        rc.reset();
         reaction.message.edit(rc.toString());
     }
 

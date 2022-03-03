@@ -10,4 +10,5 @@ module.exports = [
     new (require('./luisCommand.js'))(),
     new (require('./helpCommand.js'))(),
     new (require('./rubiksCubeCommand.js'))(),
+    new (require('./snakeCommand.js'))(),
 ]

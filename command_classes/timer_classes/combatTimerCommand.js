@@ -69,7 +69,6 @@ module.exports = class CombatTimerCommand extends Command{
             if(errmsg) this.error(msg, errmsg);
         } else if(removePlayer){
             let errmsg = EditPlayers.editPlayerCheck(msg, removePlayer, this.combatTimerMap, EditPlayers.removePlayer);
-            console.log(errmsg);
             if(errmsg) this.error(msg, errmsg);
         } else{
 			this.error(msg, 'Your message does not match the expected format.');

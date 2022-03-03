@@ -73,12 +73,12 @@ module.exports = class EditPlayers{
 
         let insertIndex = 0;
         while(combatTimer.initiativeArray[insertIndex].initiative > initiative) insertIndex++;
-        console.log(insertIndex);
+        //console.log(insertIndex);
         combatTimer.initiativeArray.splice(insertIndex, 0, token);
-        console.log(combatTimer.initiativeArray);
-        if(combatTimer.cTimerInfo.initiativeIndex > insertIndex) 
-            combatTimer.cTimerInfo.initiativeIndex = combatTimer.cTimerInfo.initiativeIndex + 1;
-
+        //console.log(combatTimer.initiativeArray);
+        if(combatTimer.cTimerInfo.initiativeIndex > insertIndex) {
+            combatTimer.cTimerInfo.initiativeIndex = combatTimer.cTimerInfo.initiativeIndex + 1 % combatTimer.initiativeArray.length;
+        }
         combatTimer.sentMessage.edit(
             PlayerTimer.makeEmbed(combatTimer)
         );

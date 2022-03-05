@@ -28,24 +28,27 @@ module.exports = class PlayerTimer extends Timer{
     static makeEmbed(combatTimer) {
         let players = combatTimer.players;
         let initiativeArray = combatTimer.initiativeArray;
-        let cTimerInfo = combatTimer.cTimerInfo;
 
         let messageEmbed =  new Discord.MessageEmbed()
             .setColor('#fc80a2')
-            .setTitle(cTimerInfo.title)
-            .setFooter(`Created by ${cTimerInfo.creator}`, 'https://cdn-icons-png.flaticon.com/512/2784/2784459.png') //picture of clock
-            .setThumbnail('https://cdn-icons.flaticon.com/png/128/5522/premium/5522602.png?token=exp=1646280339~hmac=122c0cca26bb338d89dcee504a82035f') //picture of swords
+            .setTitle(combatTimer.title)
+            .attachFiles([
+                new Discord.MessageAttachment('./command_classes/timer_classes/assets/clock.png', 'clock.png'),
+                new Discord.MessageAttachment('./command_classes/timer_classes/assets/combatTimerSwords.png', 'combatTimerSwords.png'),
+            ])
+            .setFooter(`Created by ${combatTimer.creator}`, 'attachment://clock.png')
+            .setThumbnail('attachment://combatTimerSwords.png') 
 
         for(let player of players) {    //create a field for each player
             let timeString = player.timeToString();
-            if(initiativeArray[cTimerInfo.initiativeIndex].player === player) timeString = "> " + timeString;
+            if(initiativeArray[combatTimer.initiativeIndex].player === player) timeString = "> " + timeString;
             messageEmbed.addField('``` ' + player.user + ' ```', timeString, true);
         }
         if(players.length % 3 == 2) messageEmbed.addField('\u200B','\u200B', true);
         
-        let currName = PlayerTimer.get(cTimerInfo.initiativeIndex, initiativeArray);
-        let nextName = PlayerTimer.get(cTimerInfo.initiativeIndex+1, initiativeArray);
-        let readyName = PlayerTimer.get(cTimerInfo.initiativeIndex+2, initiativeArray);
+        let currName = PlayerTimer.get(combatTimer.initiativeIndex, initiativeArray);
+        let nextName = PlayerTimer.get(combatTimer.initiativeIndex+1, initiativeArray);
+        let readyName = PlayerTimer.get(combatTimer.initiativeIndex+2, initiativeArray);
         
         messageEmbed.addFields(
                 { name: '\u200B', value: '\u200B' },

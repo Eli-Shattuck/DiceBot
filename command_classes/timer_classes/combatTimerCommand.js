@@ -16,15 +16,13 @@ class CTimer{
     constructor(message, title, creator){
         this.initMessage = message;
         this.sentMessage;
-        this.players = [];          //array of playerTimers
-        this.initiativeArray = [];  //array of initTokens
-        this.cTimerInfo = {
-            initiativeIndex: 0,     //current index in initiative array
-            title: title,
-            creator: creator,
-            defaultMins: 0,         //default mins for a player
-            defaultSecs: 0,         //default secs for a player
-        };
+        this.players = [];              //array of playerTimers
+        this.initiativeArray = [];      //array of initTokens
+        this.initiativeIndex = 0;       //current index in initiative array
+        this.title = title;
+        this.creator = creator;
+        this.defaultMins = 0;           //default mins for a player
+        this.defaultSecs = 0;           //default secs for a player
     }
 }
 
@@ -80,8 +78,8 @@ module.exports = class CombatTimerCommand extends Command{
     initCombatTimer(msg, lines, header){
         let combatTimer = new CTimer(msg, header[3], msg.author.username);
 
-        combatTimer.cTimerInfo.defaultMins = parseInt(header[1]);
-        combatTimer.cTimerInfo.defaultSecs = parseInt(header[2]);
+        combatTimer.defaultMins = parseInt(header[1]);
+        combatTimer.defaultSecs = parseInt(header[2]);
         //set the default amount of time for a player in the combat timer
 		
 		for(let i = 1; i < lines.length; i++) {
@@ -98,8 +96,8 @@ module.exports = class CombatTimerCommand extends Command{
 			} else {
 				name_tag = [row[1], undefined];
 			}
-			let mins = row[3] ? parseInt(row[3]) : combatTimer.cTimerInfo.defaultMins;
-            let secs = row[4] ? parseInt(row[4]) : combatTimer.cTimerInfo.defaultSecs;
+			let mins = row[3] ? parseInt(row[3]) : combatTimer.defaultMins;
+            let secs = row[4] ? parseInt(row[4]) : combatTimer.defaultSecs;
 			//use the custom time for a player if there is one, otherwise use default time
 
             let curPlayer;
@@ -158,7 +156,7 @@ module.exports = class CombatTimerCommand extends Command{
         let emoji = reaction.emoji.name;
 
         let combatTimer = this.combatTimerMap.get(msg.id);
-        let player = combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player;
+        let player = combatTimer.initiativeArray[combatTimer.initiativeIndex].player;
         if(player.running && emoji == PAUSE.name){
             player.pause();
             reactionHandler.removeReactions([NEXT, PAUSE], msg);
@@ -174,9 +172,9 @@ module.exports = class CombatTimerCommand extends Command{
         let msg = reaction.message;
         let combatTimer = this.combatTimerMap.get(msg.id);
         //stops the current player's timer, moves to next in initiative and starts their timer
-        combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.pause();
-        combatTimer.cTimerInfo.initiativeIndex = (combatTimer.cTimerInfo.initiativeIndex + 1) % combatTimer.initiativeArray.length; 
-        combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.start();
+        combatTimer.initiativeArray[combatTimer.initiativeIndex].player.pause();
+        combatTimer.initiativeIndex = (combatTimer.initiativeIndex + 1) % combatTimer.initiativeArray.length; 
+        combatTimer.initiativeArray[combatTimer.initiativeIndex].player.start();
         reaction.users.remove(user.id); //remove the user's reaction so they can press next again
     }
 
@@ -195,7 +193,7 @@ module.exports = class CombatTimerCommand extends Command{
         let combatTimer = this.combatTimerMap.get(msg.id);
         if(user.id != combatTimer.initMessage.author.id) return;
         //permanently stops the timer and clears it from the combat timer map
-        combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player.stop();
+        combatTimer.initiativeArray[combatTimer.initiativeIndex].player.stop();
         this.combatTimerMap.delete(msg.id);
         reactionHandler.removeReactions([PLAY, PAUSE, NEXT, STOP, INCREASE, DECREASE], msg);
         reactionHandler.removeAllCallbacks(msg);

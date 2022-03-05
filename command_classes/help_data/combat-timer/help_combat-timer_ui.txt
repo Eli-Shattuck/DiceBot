@@ -4,5 +4,5 @@ When a combat timer is made, the bot will react to it with an X and a PLAY butto
 \t*`PLAY`:  The PLAY button will start the timer of the player that is up next in the order. This will remove the PLAY button, replacing it with PAUSE and NEXT.
 \t*`NEXT`:  The NEXT button will stop the timer of the current player and advance the order, starting the timer of the next player.
 \t*`PAUSE`:  The PAUSE button will stop the current timer. This will also remove the PAUSE and NEXT button, replacing it with a PLAY button.
-\t*`DECREASE`: The creator can press this to instead make the timers increase.
-\t*`INCREASE`: The creator can press this to instead make the timers decrease.
+\t*`DECREASE`: While this is present, the timers will decrease. The creator can press this to instead make the timers increase.
+\t*`INCREASE`: While this is present, the timers will increase. The creator can press this to instead make the timers decrease.

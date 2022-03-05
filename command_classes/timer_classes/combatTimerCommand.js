@@ -36,6 +36,7 @@ module.exports = class CombatTimerCommand extends Command{
         this.combatTimerMap = new Map();
     }
 
+    //static functions are used to store the regular expressions for inputs
     static getCTimerReTitle(){
         return /--combat-timer\s+(\d+):(\d+)\s+(.+)/;
     }
@@ -91,7 +92,7 @@ module.exports = class CombatTimerCommand extends Command{
 				return;
 			}
 			
-			let name_tag;
+			let name_tag;   //name_tag holds the name and player tag for a player
 			if(row[1].indexOf('_') >= 0) {
 				name_tag = row[1].split('_');
 			} else {
@@ -106,12 +107,12 @@ module.exports = class CombatTimerCommand extends Command{
                 if(player.user == name_tag[0]) {
                     let newTime = mins * 60 + secs;
                     if (newTime > player.time) player.time = newTime;
-                    curPlayer = player;
+                    curPlayer = player;     //if the player exists, only create a new instance in the initiativeArray
                 }
             }
             if(curPlayer == undefined){ 
                 curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0], combatTimer);
-                combatTimer.players.push(curPlayer);
+                combatTimer.players.push(curPlayer);    //if the player does not exist, make a new player
             }
             
             let token = new InitToken(row[2], curPlayer, name_tag[1]);
@@ -119,15 +120,11 @@ module.exports = class CombatTimerCommand extends Command{
         }
 
 		combatTimer.initiativeArray.sort((a,b) => b.initiative - a.initiative);
-        // combatTimer.players.forEach(player => {
-        //     player.combatTimer = ct;
-        //     //give the player access to the info needed to edit the message with makeEmbed
-        // });
 		
 		let toSend = PlayerTimer.makeEmbed(combatTimer);			
 		
 		msg.channel.send(toSend)
-		.then(message => {
+		.then(message => {      //setup emojis for user to interact with the timer
 			combatTimer.players.forEach(player => player.message = message);
             combatTimer.sentMessage = message;
             this.combatTimerMap.set(message.id, combatTimer);
@@ -183,7 +180,7 @@ module.exports = class CombatTimerCommand extends Command{
         reaction.users.remove(user.id); //remove the user's reaction so they can press next again
     }
 
-    onUpDown(reaction, user){
+    onUpDown(reaction, user){   //changes if the timers count up or down
         let msg = reaction.message;
         let combatTimer = this.combatTimerMap.get(msg.id);
         if(user.id != combatTimer.initMessage.author.id) return;

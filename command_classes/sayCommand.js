@@ -6,13 +6,15 @@ module.exports = class ILYCommand extends Command{
         super();
     }
 
+
+
     match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf('--i love you') === 0;
+        return msg.content.toLowerCase().indexOf('--say') === 0;
     };
     
     handle(msg){
-        this.responseList.push(responses.reply(msg, 'I love you too <3'));
+        this.responseList.push(responses.message(msg.channel, msg.content.substring('--say '.length)));
         return;
     };
 }

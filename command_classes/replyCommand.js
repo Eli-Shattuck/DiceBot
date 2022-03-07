@@ -8,11 +8,11 @@ module.exports = class ILYCommand extends Command{
 
     match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf('--i love you') === 0;
+        return msg.content.toLowerCase().indexOf('--reply ') === 0;
     };
     
     handle(msg){
-        this.responseList.push(responses.reply(msg, 'I love you too <3'));
+        this.responseList.push(responses.reply(msg, msg.content.substring('--reply '.length)));
         return;
     };
 }

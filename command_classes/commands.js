@@ -11,4 +11,6 @@ module.exports = [
     new (require('./helpCommand.js'))(),
     new (require('./rubiksCubeCommand.js'))(),
     new (require('./snakeCommand.js'))(),
+    new (require('./replyCommand.js'))(),
+    new (require('./sayCommand.js'))(),
 ]

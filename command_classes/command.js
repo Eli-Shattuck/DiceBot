@@ -1,5 +1,7 @@
 module.exports = class Command{
-    constructor(){}
+    constructor(){
+        this.responseList = [];
+    }
 
     match(msg){}
 
@@ -7,5 +9,9 @@ module.exports = class Command{
 
     error(msg, errMsg) {
         msg.reply(`${errMsg} Try --help for more info.`)
+    }
+
+    clear(){
+        this.responseList = [];
     }
 }

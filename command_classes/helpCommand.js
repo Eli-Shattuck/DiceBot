@@ -2,6 +2,7 @@ const Command = require('./command.js');
 const Discord = require('discord.js');
 const reactionHandler = require('../io_classes/reactionHandler.js');
 const UIEmojis = require('../io_classes/uiEmojis.js');
+const responses = require('../io_classes/responses.js');
 
 module.exports = class HelpCommand extends Command{
     constructor(onNewResponse) {
@@ -48,15 +49,21 @@ module.exports = class HelpCommand extends Command{
             this.pageIndex = 0;
         }      
 
-        msg.channel.send(this.makeEmbed())
-        .then(message => {
-            reactionHandler.addCallback(
-                [UIEmojis.TRASH, UIEmojis.PREVIOUS, UIEmojis.NEXT],
-                message,
-                this.onReaction.bind(this)
-            );
-            reactionHandler.addReactions([UIEmojis.TRASH, UIEmojis.PREVIOUS, UIEmojis.NEXT], message);
-        });
+        this.push(
+            responses.message(
+                msg.channel,
+                this.makeEmbed(),
+                undefined,
+                message => {
+                    reactionHandler.addCallback(
+                        [UIEmojis.TRASH, UIEmojis.PREVIOUS, UIEmojis.NEXT],
+                        message,
+                        this.onReaction.bind(this)
+                    );
+                    reactionHandler.addReactions([UIEmojis.TRASH, UIEmojis.PREVIOUS, UIEmojis.NEXT], message);
+                }
+            )
+        )
         return;
     };
 
@@ -85,9 +92,9 @@ module.exports = class HelpCommand extends Command{
             else this.pageIndex = this.chapters[this.chapterIndex].pages.length - 1;
         }
 
-        msg.edit(
-            this.makeEmbed()
-        );
+        this.push(
+            responses.edit(msg, this.makeEmbed())
+        )
 
         reaction.users.remove(user.id);
     }

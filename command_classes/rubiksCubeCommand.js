@@ -2,6 +2,7 @@ const Command = require('./command.js');
 const reactionHandler = require('../io_classes/reactionHandler.js');
 const UIEmojis = require('../io_classes/uiEmojis.js');
 const scrambleGenerator = require('rubiks-cube-scramble');
+const responses = require('../io_classes/responses.js');
 
 const startingUIElements = [
     UIEmojis.TRASH, UIEmojis.SHUFFLE, UIEmojis.SORT, UIEmojis.UP, UIEmojis.DOWN, UIEmojis.FRONT, UIEmojis.BACK, UIEmojis.LEFT, UIEmojis.RIGHT, UIEmojis.CW
@@ -342,7 +343,7 @@ return `....o1o2o3
         let scram1 = scram.substring(0, centerSpace+1);
         let scram2 = scram.substring(centerSpace+1);
         repr = repr.replace('#1', scram1).replace('#2', scram2);
-        console.log(repr.length);
+        //console.log(repr.length);
         return repr;
     }
 }
@@ -361,42 +362,48 @@ module.exports = class RubiksCubeCommand extends Command{
     handle(msg){
         let rc = new Cube();
         //console.log(Cube.getNet());
-        msg.channel.send(rc.toString())
-        .then(message => {
-            rc.message = message;
-            this.cubes[message.id] = rc;
-            reactionHandler.addReactions(startingUIElements, message);
-
-            reactionHandler.addCallback(
-                turningUIElements,
-                message,
-                this.turn.bind(this)
-            );
-
-            reactionHandler.addCallback(
-                toggledUIElements,
-                message,
-                this.toggleDirection.bind(this)
-            );
-
-            reactionHandler.addCallback(
-                [UIEmojis.SHUFFLE],
-                message,
-                this.shuffle.bind(this)
-            );
-
-            reactionHandler.addCallback(
-                [UIEmojis.SORT],
-                message,
-                this.sort.bind(this)
-            );
-
-            reactionHandler.addCallback(
-                [UIEmojis.TRASH],
-                message,
-                this.delete.bind(this)
-            );
-        })
+        this.push(
+            responses.message(
+                msg.channel,
+                rc.toString(),
+                undefined,
+                message => {
+                    rc.message = message;
+                    this.cubes[message.id] = rc;
+                    reactionHandler.addReactions(startingUIElements, message);
+        
+                    reactionHandler.addCallback(
+                        turningUIElements,
+                        message,
+                        this.turn.bind(this)
+                    );
+        
+                    reactionHandler.addCallback(
+                        toggledUIElements,
+                        message,
+                        this.toggleDirection.bind(this)
+                    );
+        
+                    reactionHandler.addCallback(
+                        [UIEmojis.SHUFFLE],
+                        message,
+                        this.shuffle.bind(this)
+                    );
+        
+                    reactionHandler.addCallback(
+                        [UIEmojis.SORT],
+                        message,
+                        this.sort.bind(this)
+                    );
+        
+                    reactionHandler.addCallback(
+                        [UIEmojis.TRASH],
+                        message,
+                        this.delete.bind(this)
+                    );
+                }
+            )
+        )
         return;
     };
 
@@ -424,7 +431,9 @@ module.exports = class RubiksCubeCommand extends Command{
                 rc.down();
             break;
         }
-        msg.edit(rc.toString());
+        this.push(
+            responses.edit(msg, rc.toString())
+        )
     }
 
     toggleDirection(reaction) {
@@ -442,14 +451,18 @@ module.exports = class RubiksCubeCommand extends Command{
         reaction.users.remove(user.id);
         let rc = this.cubes[reaction.message.id];
         rc.scramble(scrambleGenerator.default({ turns: 30 }).substring(1));
-        reaction.message.edit(rc.toString());
+        this.push(
+            responses.edit(reaction.message, rc.toString())
+        );
     }
 
     sort(reaction, user) {
         reaction.users.remove(user.id);
         let rc = this.cubes[reaction.message.id];
         rc.reset();
-        reaction.message.edit(rc.toString());
+        this.push(
+            responses.edit(reaction.message, rc.toString())
+        );
     }
 
     delete(reaction) {

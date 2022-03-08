@@ -1,4 +1,5 @@
 const Command = require('./command.js');
+const responses = require('../io_classes/responses.js');
 
 module.exports = class SudokuCommand extends Command {
     
@@ -26,9 +27,13 @@ module.exports = class SudokuCommand extends Command {
     
       let grid = this.sanitizeInput(msg.content);
       if(this.solveGrid(grid)){
-        msg.reply(this.toStringGrid(grid));
+        this.push(
+          responses.reply(msg, this.toStringGrid(grid))
+        );
       } else {
-        msg.reply('no solution exists'); 
+        this.push(
+          responses.reply(msg, 'no solution exists')
+        );
       }	
       return;
     }

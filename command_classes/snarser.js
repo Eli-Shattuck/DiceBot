@@ -58,16 +58,20 @@ function snakeString(str) {
 function snake(content) {
     if(content instanceof Discord.MessageEmbed) {
         //console.log(toSend);
+        let messageEmbed =  new Discord.MessageEmbed()
         for(let field of content.fields) {
-            field.name = snakeString(field.name);
-            field.value = snakeString(field.value);
+            messageEmbed.addField(snakeString(field.name), snakeString(field.value), field.inline)
         }
-        if(content.footer) content.footer.text = snakeString(content.footer.text);
-        if(content.title) content.title = snakeString(content.title);
-        if(content.description) content.description = snakeString(content.description);
-        if(content.thumbnail) content.thumbnail.url = 'https://cdn-icons-png.flaticon.com/512/3662/3662068.png';
 
-        return content;
+        if(content.footer || content.thumbnail) messageEmbed.attachFiles([
+            new Discord.MessageAttachment('./assets/snakeySnake.png', 'snake.png')
+        ]);
+        if(content.footer) messageEmbed.setFooter(snakeString(content.footer.text), 'attachment://snake.png');
+        if(content.title) messageEmbed.title = snakeString(content.title);
+        if(content.description) messageEmbed.description = snakeString(content.description);
+        if(content.thumbnail) messageEmbed.setThumbnail('attachment://snake.png');
+
+        return messageEmbed;
     } else if(content.constructor.name === "String") {
         return snakeString(content);
     } else {

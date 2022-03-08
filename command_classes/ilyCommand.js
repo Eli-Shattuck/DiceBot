@@ -7,7 +7,6 @@ module.exports = class ILYCommand extends Command{
     }
 
     static match(msg){
-        console.log(msg);
         return msg.content.toLowerCase().indexOf('--i love you') === 0;
     };
     

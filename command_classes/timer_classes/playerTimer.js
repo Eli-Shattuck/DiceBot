@@ -35,8 +35,8 @@ module.exports = class PlayerTimer extends Timer{
             .setColor('#fc80a2')
             .setTitle(combatTimer.title)
             .attachFiles([
-                new Discord.MessageAttachment('./command_classes/timer_classes/assets/clock.png', 'clock.png'),
-                new Discord.MessageAttachment('./command_classes/timer_classes/assets/combatTimerSwords.png', 'combatTimerSwords.png'),
+                new Discord.MessageAttachment('./assets/clock.png', 'clock.png'),
+                new Discord.MessageAttachment('./assets/combatTimerSwords.png', 'combatTimerSwords.png'),
             ])
             .setFooter(`Created by ${combatTimer.creator}`, 'attachment://clock.png')
             .setThumbnail('attachment://combatTimerSwords.png') 

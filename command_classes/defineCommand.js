@@ -3,9 +3,16 @@ const responses = require('../io_classes/responses.js');
 
 let Parser = undefined;
 
+let globalMacros = [];
+
 module.exports = class DefineCommand extends Command {
     constructor(onNewResponse){
         super(onNewResponse);
+        this.msg;
+    }
+
+    static pushMacro(macro) {
+        globalMacros;
     }
 
     static getDefineRE() {
@@ -18,6 +25,7 @@ module.exports = class DefineCommand extends Command {
     };
     
     handle(msg){
+        this.msg = msg;
         let matchDefine = msg.content.match(DefineCommand.getDefineRE());
 
         let macroName = matchDefine[1];
@@ -27,19 +35,21 @@ module.exports = class DefineCommand extends Command {
         
         let code = matchDefine[3];
 
-        let args = ['1', '2'];
-        let f = new Function('args', '__parse', code + ';console.log("test");');
+        //let args = ['1', '2'];
+        let f = new Function('args', '__parse', code);
 
-        this.push(responses.reply(msg, 'running\n'+code));
-
-        f(args, DefineCommand.parse);
+        //f(args, this.parse.bind(this));
 
         return;
     };
 
-    static parse(str) {
+    parse(str) {
+        //console.log('parsing\n'+str);
+        let oldContent = this.msg.content;
+        this.msg.content = str;
         if(!Parser) Parser = require('../parser.js');
-        let p = new Parser(str);
-        p.parse();        
+        let p = new Parser(this.msg);
+        p.parse(); 
+        this.msg.content = oldContent;       
     }
 }

@@ -12,5 +12,6 @@ module.exports = [
     require('./rubiksCubeCommand.js'),
     require('./snakeCommand.js'),
     require('./replyCommand.js'),
-    require('./sayCommand.js')
+    require('./sayCommand.js'),
+    require('./defineCommand.js')
 ]

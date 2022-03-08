@@ -22,7 +22,9 @@ module.exports = class EditPlayers{
             if(combatTimer.initMessage.author.id === msg.author.id) timersByAuthor.push(combatTimer);
         }
         if(timersByAuthor.length === 0) return 'You cannot edit your players because you have not made a combat timer.';
-        else if(timersByAuthor.length === 1) addOrRemove(info, timersByAuthor[0], msg, push); //if they only have one timer, edit it
+        else if(timersByAuthor.length === 1){
+             addOrRemove(info, timersByAuthor[0], msg, push); //if they only have one timer, edit it
+        }
         else if(timersByAuthor.length > 1) {
             let toSend = ""; //create a list of all the authors, will add a string in front of it
             for(let i = 0; i < timersByAuthor.length; i++){
@@ -89,7 +91,8 @@ module.exports = class EditPlayers{
             }
         }
         if(curPlayer == undefined){     //make a new player if they dont exist
-            curPlayer = new PlayerTimer(mins, secs, combatTimer.sentMessage, name_tag[0]);
+            curPlayer = new PlayerTimer(mins, secs, combatTimer.initMessage, name_tag[0], combatTimer, push);
+            curPlayer.msg = combatTimer.sentMessage;
             combatTimer.players.push(curPlayer);
         }
 
@@ -112,7 +115,6 @@ module.exports = class EditPlayers{
                 PlayerTimer.makeEmbed(combatTimer)
             )
         );
-        console.log(combatTimer.players);
     }
 
     static removePlayer(info, combatTimer, msg, push){

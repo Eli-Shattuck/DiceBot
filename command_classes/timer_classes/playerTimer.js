@@ -23,7 +23,7 @@ module.exports = class PlayerTimer extends Timer{
 
     editMessage() {
         this.push(
-            responses.edit(this.message, PlayerTimer.makeEmbed(this.combatTimer))
+            responses.edit(this.msg, PlayerTimer.makeEmbed(this.combatTimer))
         );
     }
 

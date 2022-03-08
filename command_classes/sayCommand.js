@@ -1,7 +1,7 @@
 const Command = require('./command.js');
 const responses = require('../io_classes/responses.js');
 
-module.exports = class ILYCommand extends Command{
+module.exports = class SayCommand extends Command{
     constructor(onNewResponse){
         super(onNewResponse);
     }

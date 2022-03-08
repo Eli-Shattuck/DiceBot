@@ -2,6 +2,7 @@ const Command = require('../command.js');
 const Timer = require('./timer.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
 const UIEmojis = require('../../io_classes/UIEmojis');
+const responses = require('../../io_classes/responses.js');
 
 const PLAY = UIEmojis.PLAY;
 const PAUSE = UIEmojis.PAUSE;
@@ -32,27 +33,29 @@ module.exports = class TimerCommand extends Command{
         let mins = parseInt(matchTimer[1]);
         let secs = parseInt(matchTimer[2]);
 
-        let t = new Timer(mins, secs, msg, msg.author);
+        let t = new Timer(mins, secs, msg, msg.author, this.responseList);
 
-        msg.channel.send(t.formatTimeString()).then(message => {
-            t.message = message;
-            this.timerMap[t.message.id] = t;
+        this.responseList.push
+        
+        (t.formatTimeString()).then(message => {
+            t.msg = message;
+            this.timerMap[t.msg.id] = t;
             reactionHandler.addCallback(
                 [PLAY, PAUSE],
-                t.message,
+                t.msg,
                 this.onPlayPause.bind(this)
             );
             reactionHandler.addCallback(
                 [INCREASE, DECREASE],
-                t.message,
+                t.msg,
                 this.onUpDown.bind(this)
             );
             reactionHandler.addCallback(
                 [STOP],
-                t.message,
+                t.msg,
                 this.onStop.bind(this)
             );
-            reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
+            reactionHandler.addReactions([STOP, DECREASE, PLAY], t.msg);
         });
 
 

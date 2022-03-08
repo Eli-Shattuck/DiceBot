@@ -59,6 +59,7 @@ function snake(content) {
     if(content instanceof Discord.MessageEmbed) {
         //console.log(toSend);
         let messageEmbed =  new Discord.MessageEmbed()
+        messageEmbed.color = content.color;
         for(let field of content.fields) {
             messageEmbed.addField(snakeString(field.name), snakeString(field.value), field.inline)
         }

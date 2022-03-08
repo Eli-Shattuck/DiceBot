@@ -39,6 +39,7 @@ module.exports = class TimerCommand extends Command{
             responses.message(
                 msg.channel,
                 t.formatTimeString(),
+                undefined,
                 message => {
                     t.msg = message;
                     this.timerMap[t.msg.id] = t;

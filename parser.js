@@ -34,25 +34,25 @@ module.exports = class Parser{
 
     sendMessage(response){
         if(response.thenLambda){
-            response.channel.send(response.content).then(response.thenLambda)
+            response.channel.send(response.content, response.attachment).then(response.thenLambda)
         } else {
-            response.channel.send(response.content)
+            response.channel.send(response.content, response.attachment)
         }
     }
 
     replyMessage(response){
         if(response.thenLambda){
-            response.msg.reply(response.content).then(response.thenLambda)
+            response.msg.reply(response.content, response.attachment).then(response.thenLambda)
         } else {
-            response.msg.reply(response.content)
+            response.msg.reply(response.content, response.attachment)
         }
     }
 
     editMessage(response){
         if(response.thenLambda){
-            response.msg.edit(response.content).then(response.thenLambda)
+            response.msg.edit(response.content, response.attachment).then(response.thenLambda)
         } else {
-            response.msg.edit(response.content)
+            response.msg.edit(response.content, response.attachment)
         }
     }
 }

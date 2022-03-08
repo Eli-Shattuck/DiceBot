@@ -128,6 +128,7 @@ module.exports = class CombatTimerCommand extends Command{
             responses.message(
                 msg.channel,
                 PlayerTimer.makeEmbed(combatTimer),
+                undefined,
                 message => {      //setup emojis for user to interact with the timer
                     combatTimer.players.forEach(player => player.msg = message);
                     combatTimer.sentMessage = message;

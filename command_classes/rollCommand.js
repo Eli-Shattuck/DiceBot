@@ -1,6 +1,6 @@
 const Command = require('./command.js');
-const BatchList = require('../io_classes/batchList.js')
-
+//const BatchList = require('../io_classes/batchList.js')
+const responses = require('../io_classes/responses.js');
 
 const aliesLen = '--roll 0123'.length;
 const alieses = {
@@ -116,12 +116,12 @@ module.exports = class RollCommand extends Command{
     }
 
     handle(msg){
-        let text = this.checkAlies(msg.content)
+        let text = this.checkAlies(msg.content);
         let args = this.parseArgs(text, msg);
         if(args == undefined) return;
 
         let [n, x, b, options] = args;
-        console.log(n, x, b, options);
+        //console.log(n, x, b, options);
         
         let loop;
         let loopSize = 1;
@@ -136,7 +136,9 @@ module.exports = class RollCommand extends Command{
         let dis;
         if(options) dis = options.find( elt => elt.name==='-dis' );
 
-        msg.channel.send(`${msg.author} is rolling...`);
+        this.push(
+            responses.message(msg.channel, `${msg.author} is rolling...`)
+        );
 
         for(let i = 0; i < loopSize; i++) {
             let results;
@@ -160,24 +162,31 @@ module.exports = class RollCommand extends Command{
     sendResults(msg, results, extraLines, bazz){
         if(bazz) {
             for(let res of results) {
-                msg.channel.send(
-                    `./command_classes/bazz/baz-${res}.png`, 
-                    { files: [`./command_classes/bazz/baz-${res}.png`] }
-                );
+                this.push(
+                    responses.message(
+                        msg.channel,
+                        `./command_classes/bazz/baz-${res}.png`, 
+                        { files: [`./command_classes/bazz/baz-${res}.png`] }
+                        )
+                )
             }
         } else {
             let toSend = "";
             for(let res of results) {
                 toSend += res + "\n";
             }
-            msg.channel.send(toSend);
+            this.push(
+                responses.message(msg.channel, toSend)
+            );
         }
         if(extraLines) {
             let toSend = '';
             for(let line of extraLines) {
                 toSend += line + "\n";
             }
-            msg.channel.send(toSend);
+            this.push(
+                responses.message(msg.channel, toSend)
+            );
         }
     }
 
@@ -373,7 +382,7 @@ module.exports = class RollCommand extends Command{
         //console.log(options);
 
         let list = options.split(/\s+/); //does not split properly
-        console.log(list);
+        //console.log(list);
         for(let i=0; i<list.length; i++){
             let op = list[i]; //what about flags with arguments
             if(disallowedFlagPairs.has(op)){

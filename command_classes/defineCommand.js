@@ -12,7 +12,11 @@ module.exports = class DefineCommand extends Command {
     }
 
     static pushMacro(macro) {
-        globalMacros;
+        globalMacros.push(macro);
+    }
+
+    static getMacros() {
+        return globalMacros;
     }
 
     static getDefineRE() {
@@ -38,6 +42,11 @@ module.exports = class DefineCommand extends Command {
         //let args = ['1', '2'];
         let f = new Function('args', '__parse', code);
 
+        let matchRE = macroName+'\\s+(.+)'.repeat(isNaN(argc) ? 0 : argc);
+        DefineCommand.pushMacro({match: (msg)=>msg.content.indexOf(macroName) === 0, handle: (msg) => {
+            let match = msg.content.match(matchRE);
+            
+        }});
         //f(args, this.parse.bind(this));
 
         return;

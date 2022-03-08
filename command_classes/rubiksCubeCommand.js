@@ -348,12 +348,12 @@ return `....o1o2o3
 }
 
 module.exports = class RubiksCubeCommand extends Command{
-    constructor(){
-        super();
+    constructor(onNewResponse){
+        super(onNewResponse);
         this.cubes = {};
     }
 
-    match(msg){
+    static match(msg){
         //console.log(msg.content.toLowerCase());
         return msg.content.toLowerCase().indexOf("--rubik's") === 0;
     };

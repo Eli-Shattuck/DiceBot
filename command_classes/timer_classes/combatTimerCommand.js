@@ -4,6 +4,7 @@ const EditPlayers = require('./editPlayers.js');
 const InitToken = require('./initToken.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
+const responses = require('../../io_classes/responses.js');
 
 const PLAY = UIEmojis.PLAY;
 const PAUSE = UIEmojis.PAUSE;
@@ -11,6 +12,8 @@ const STOP = UIEmojis.STOP;
 const NEXT = UIEmojis.NEXT;
 const INCREASE = UIEmojis.INCREASE;
 const DECREASE = UIEmojis.DECREASE;
+
+let globalCombatTimerMap = new Map();
 
 class CTimer{
     constructor(message, title, creator){
@@ -29,9 +32,9 @@ class CTimer{
 
 
 module.exports = class CombatTimerCommand extends Command{
-    constructor(){
-        super();
-        this.combatTimerMap = new Map();
+    constructor(onNewResponse){
+        super(onNewResponse);
+        this.combatTimerMap = globalCombatTimerMap;
     }
 
     //static functions are used to store the regular expressions for inputs
@@ -51,7 +54,9 @@ module.exports = class CombatTimerCommand extends Command{
         return /--combat-timer removeplayer "([^_]+(?:_[^_]+)?)"/;
     }
 
-    match(msg){
+
+
+    static match(msg){
         return msg.content.indexOf('--combat-timer') === 0;
     }
 
@@ -64,10 +69,10 @@ module.exports = class CombatTimerCommand extends Command{
         if(header && lines.length > 1) {
             this.initCombatTimer(msg, lines, header);
 		} else if(addPlayer){
-            let errmsg = EditPlayers.editPlayerCheck(msg, addPlayer, this.combatTimerMap, EditPlayers.addPlayer);
+            let errmsg = EditPlayers.editPlayerCheck(msg, addPlayer, this.combatTimerMap, EditPlayers.addPlayer, this.push.bind(this));
             if(errmsg) this.error(msg, errmsg);
         } else if(removePlayer){
-            let errmsg = EditPlayers.editPlayerCheck(msg, removePlayer, this.combatTimerMap, EditPlayers.removePlayer);
+            let errmsg = EditPlayers.editPlayerCheck(msg, removePlayer, this.combatTimerMap, EditPlayers.removePlayer, this.push.bind(this));
             if(errmsg) this.error(msg, errmsg);
         } else{
 			this.error(msg, 'Your message does not match the expected format.');
@@ -109,7 +114,7 @@ module.exports = class CombatTimerCommand extends Command{
                 }
             }
             if(curPlayer == undefined){ 
-                curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0], combatTimer);
+                curPlayer = new PlayerTimer(mins, secs, msg, name_tag[0], combatTimer, this.push.bind(this));
                 combatTimer.players.push(curPlayer);    //if the player does not exist, make a new player
             }
             
@@ -119,36 +124,39 @@ module.exports = class CombatTimerCommand extends Command{
 
 		combatTimer.initiativeArray.sort((a,b) => b.initiative - a.initiative);
 		
-		let toSend = PlayerTimer.makeEmbed(combatTimer);			
-		
-		msg.channel.send(toSend)
-		.then(message => {      //setup emojis for user to interact with the timer
-			combatTimer.players.forEach(player => player.message = message);
-            combatTimer.sentMessage = message;
-            this.combatTimerMap.set(message.id, combatTimer);
-
-            reactionHandler.addCallback(
-                [PLAY, PAUSE],
-                message,
-                this.onPlayPause.bind(this)
-            );
-            reactionHandler.addCallback(
-                [INCREASE, DECREASE],
-                message,
-                this.onUpDown.bind(this)
-            );
-            reactionHandler.addCallback(
-                [NEXT],
-                message,
-                this.onNext.bind(this)
-            );
-            reactionHandler.addCallback(
-                [STOP],
-                message,
-                this.onStop.bind(this)
-            );
-            reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
-		});
+        this.push(
+            responses.message(
+                msg.channel,
+                PlayerTimer.makeEmbed(combatTimer),
+                message => {      //setup emojis for user to interact with the timer
+                    combatTimer.players.forEach(player => player.message = message);
+                    combatTimer.sentMessage = message;
+                    this.combatTimerMap.set(message.id, combatTimer);
+        
+                    reactionHandler.addCallback(
+                        [PLAY, PAUSE],
+                        message,
+                        this.onPlayPause.bind(this)
+                    );
+                    reactionHandler.addCallback(
+                        [INCREASE, DECREASE],
+                        message,
+                        this.onUpDown.bind(this)
+                    );
+                    reactionHandler.addCallback(
+                        [NEXT],
+                        message,
+                        this.onNext.bind(this)
+                    );
+                    reactionHandler.addCallback(
+                        [STOP],
+                        message,
+                        this.onStop.bind(this)
+                    );
+                    reactionHandler.addReactions([STOP, DECREASE, PLAY], message);
+                }
+            )
+        );
     }
 
     onPlayPause(reaction){

@@ -1,10 +1,12 @@
 const Timer = require('./timer.js');
 const Discord = require('discord.js');
+const responses = require('../../io_classes/responses.js');
 
 module.exports = class PlayerTimer extends Timer{
-    constructor(mins, secs, initMessage, user, combatTimer){
+    constructor(mins, secs, initMessage, user, combatTimer, push){
         super(mins, secs, initMessage, user);
         this.combatTimer = combatTimer;
+        this.push = push;
     }
 
     start() {
@@ -19,9 +21,9 @@ module.exports = class PlayerTimer extends Timer{
         this.pause();
     }
 
-    editMessage(prefix) {
-        this.message.edit(
-            PlayerTimer.makeEmbed(this.combatTimer)
+    editMessage() {
+        this.push(
+            responses.edit(this.message, PlayerTimer.makeEmbed(this.combatTimer))
         );
     }
 

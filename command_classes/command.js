@@ -1,17 +1,19 @@
 module.exports = class Command{
-    constructor(){
-        this.responseList = [];
+    constructor(onNewResponse){
+        this.onNewResponse = onNewResponse;
     }
 
-    match(msg){}
+    static match(msg){}
 
     handle(msg){}
 
     error(msg, errMsg) {
-        msg.reply(`${errMsg} Try --help for more info.`)
+        this.push( 
+            responses.reply(msg, `${errMsg} Try --help for more info.`) 
+        );
     }
 
-    clear(){
-        this.responseList = [];
+    push(res) {
+        this.onNewResponse(res);
     }
 }

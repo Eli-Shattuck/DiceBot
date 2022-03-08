@@ -1,7 +1,7 @@
 const responses = require('../../io_classes/responses.js');
 
 module.exports = class Timer{
-    constructor(mins, secs, initMessage, user, responseList) {
+    constructor(mins, secs, initMessage, user, push) {
         this.intervalId;
         this.time = mins * 60 + secs;
         this.user = user;
@@ -9,7 +9,7 @@ module.exports = class Timer{
         this.initMessage = initMessage;
         this.running = false;
         this.increment = -1;
-        this.responseList;
+        this.push = push;
     }
 
     timeToString() {
@@ -54,7 +54,7 @@ module.exports = class Timer{
         //console.log(this.message);
         let newMsg = this.formatTimeString();
         if(prefix) newMsg = prefix + newMsg;
-        this.responseList.push(
+        this.push(
             responses.edit(this.msg, newMsg)
         )
     }

@@ -4,8 +4,8 @@ const reactionHandler = require('../io_classes/reactionHandler.js');
 const UIEmojis = require('../io_classes/uiEmojis.js');
 
 module.exports = class HelpCommand extends Command{
-    constructor() {
-        super();
+    constructor(onNewResponse) {
+        super(onNewResponse);
 
         this.fs = require('fs');
 
@@ -18,7 +18,7 @@ module.exports = class HelpCommand extends Command{
         //console.log('---ELI---')
     }
 
-    match(msg){
+    static match(msg){
         //console.log(msg.content.toLowerCase());
         return msg.content.toLowerCase().indexOf('--help') === 0;
     };

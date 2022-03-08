@@ -11,8 +11,8 @@ const INCREASE = UIEmojis.INCREASE;
 const DECREASE = UIEmojis.DECREASE;
 
 module.exports = class TimerCommand extends Command{
-    constructor(){
-        super();
+    constructor(onNewResponse){
+        super(onNewResponse);
         this.timerMap = new Map();
     }
 
@@ -20,7 +20,7 @@ module.exports = class TimerCommand extends Command{
         return /--timer\s+([0-9]+):([0-9]+)/;
     }
 
-    match(msg){
+    static match(msg){
         return msg.content.indexOf('--timer') === 0;
     }
     
@@ -33,31 +33,34 @@ module.exports = class TimerCommand extends Command{
         let mins = parseInt(matchTimer[1]);
         let secs = parseInt(matchTimer[2]);
 
-        let t = new Timer(mins, secs, msg, msg.author, this.responseList);
+        let t = new Timer(mins, secs, msg, msg.author, this.push.bind(this));
 
-        this.responseList.push
-        
-        (t.formatTimeString()).then(message => {
-            t.msg = message;
-            this.timerMap[t.msg.id] = t;
-            reactionHandler.addCallback(
-                [PLAY, PAUSE],
-                t.msg,
-                this.onPlayPause.bind(this)
-            );
-            reactionHandler.addCallback(
-                [INCREASE, DECREASE],
-                t.msg,
-                this.onUpDown.bind(this)
-            );
-            reactionHandler.addCallback(
-                [STOP],
-                t.msg,
-                this.onStop.bind(this)
-            );
-            reactionHandler.addReactions([STOP, DECREASE, PLAY], t.msg);
-        });
-
+        this.push(
+            responses.message(
+                msg.channel,
+                t.formatTimeString(),
+                message => {
+                    t.msg = message;
+                    this.timerMap[t.msg.id] = t;
+                    reactionHandler.addCallback(
+                        [PLAY, PAUSE],
+                        t.msg,
+                        this.onPlayPause.bind(this)
+                    );
+                    reactionHandler.addCallback(
+                        [INCREASE, DECREASE],
+                        t.msg,
+                        this.onUpDown.bind(this)
+                    );
+                    reactionHandler.addCallback(
+                        [STOP],
+                        t.msg,
+                        this.onStop.bind(this)
+                    );
+                    reactionHandler.addReactions([STOP, DECREASE, PLAY], t.msg);
+                }
+            )
+        );
 
         return;
     }

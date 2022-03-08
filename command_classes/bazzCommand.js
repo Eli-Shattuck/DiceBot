@@ -3,11 +3,11 @@
 const Command = require('./command.js');
 
 module.exports = class BazzCommand extends Command{
-    constructor() {
-        super();
+    constructor(onNewResponse) {
+        super(onNewResponse);
     }
 
-    match(msg) {
+    static match(msg) {
         return msg.content.toLowerCase().indexOf('--bazz') === 0;
     };
     

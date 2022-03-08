@@ -1,6 +1,7 @@
 const PlayerTimer = require('./playerTimer.js');
 const InitToken = require('./initToken.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
+const responses = require('../../io_classes/responses.js');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
 
 const NUMS = UIEmojis.NUMS;
@@ -15,43 +16,59 @@ module.exports = class EditPlayers{
     constructor(){
     }
 
-    static editPlayerCheck(msg, info, combatTimerMap, addOrRemove){
+    static editPlayerCheck(msg, info, combatTimerMap, addOrRemove, push){
         let timersByAuthor = [];    //create a list of all timers by the message author
         for(let [combatTimerID, combatTimer] of combatTimerMap){
             if(combatTimer.initMessage.author.id === msg.author.id) timersByAuthor.push(combatTimer);
         }
         if(timersByAuthor.length === 0) return 'You cannot edit your players because you have not made a combat timer.';
-        else if(timersByAuthor.length === 1) addOrRemove(info, timersByAuthor[0], msg); //if they only have one timer, edit it
+        else if(timersByAuthor.length === 1) addOrRemove(info, timersByAuthor[0], msg, push); //if they only have one timer, edit it
         else if(timersByAuthor.length > 1) {
             let toSend = ""; //create a list of all the authors, will add a string in front of it
             for(let i = 0; i < timersByAuthor.length; i++){
-                toSend += `\n${i+1}: ${timersByAuthor[i].cTimerInfo.title}, created at ${timersByAuthor[i].initMessage.createdAt}`;
+                toSend += `\n${i+1}: ${timersByAuthor[i].title}, created at ${timersByAuthor[i].initMessage.createdAt}`;
             }
             if(timersByAuthor.length > 9) {
-                msg.reply(`\nYou have too many timers. Please stop some of these by reacting to them with their X before trying again.` + toSend);
+                push(
+                    responses.reply(msg, `\nYou have too many timers. Please stop some of these by reacting to them with their X before trying again.` + toSend)
+                )
                 return;
             }
-            msg.reply("You have multiple combat timers. Please choose one to edit:" + toSend)
-            .then(newMessage => { //create a reaction of to the message for each combat timer, and edit the one matching their reaction
-                reactionHandler.addReactions(NUMS.slice(1, timersByAuthor.length+1), newMessage);
-                reactionHandler.addCallback(
-                    NUMS.slice(1, timersByAuthor.length+1),
-                    newMessage,
-                    (reaction, user) => {
-                        if(user.id != msg.author.id) return;
-                        let timerIndex = NUMS.findIndex(elt => elt.id === reaction.emoji.id) - 1;
-                        addOrRemove(info, timersByAuthor[timerIndex], msg);
-                        reactionHandler.removeAllCallbacks(newMessage); 
-                        newMessage.delete(); //remove the message after the combat timer to be edited has been chosen
+
+            push(
+                responses.reply(
+                    msg,
+                    "You have multiple combat timers. Please choose one to edit:" + toSend,
+                    newMessage => { //create a reaction of to the message for each combat timer, and edit the one matching their reaction
+                        reactionHandler.addReactions(NUMS.slice(1, timersByAuthor.length+1), newMessage);
+                        reactionHandler.addCallback(
+                            NUMS.slice(1, timersByAuthor.length+1),
+                            newMessage,
+                            (reaction, user) => {
+                                if(user.id != msg.author.id) return;
+                                let timerIndex = NUMS.findIndex(elt => elt.id === reaction.emoji.id) - 1;
+                                addOrRemove(info, timersByAuthor[timerIndex], msg, push);
+                                reactionHandler.removeAllCallbacks(newMessage); 
+                                newMessage.delete(); //remove the message after the combat timer to be edited has been chosen
+                            }
+                        );
                     }
-                );
-            });
+                )
+            )
         } else {
             return 'Something went wrong when trying to retrieve the combat timers.';
         }
     }
 
-    static addPlayer(info, combatTimer){
+    static addPlayer(info, combatTimer, msg, push){
+        let playerUp = combatTimer.initiativeArray[combatTimer.initiativeIndex].player;
+        
+        if(playerUp.running){  //pause the timer if it is running
+            playerUp.pause();
+            reactionHandler.removeReactions([NEXT, PAUSE], combatTimer.sentMessage);
+            reactionHandler.addReactions([PLAY], combatTimer.sentMessage);
+        }
+        
         let name_tag;   //name tag has the name and player tag
 		if(info[1].indexOf('_') >= 0) {
 			name_tag = info[1].split('_');
@@ -60,8 +77,8 @@ module.exports = class EditPlayers{
 		}
 
         //use custom mins and secs if they are given, otherwise use defaults
-        let mins = info[3] ? parseInt(info[3]) : combatTimer.cTimerInfo.defaultMins; 
-        let secs = info[4] ? parseInt(info[4]) : combatTimer.cTimerInfo.defaultSecs;
+        let mins = info[3] ? parseInt(info[3]) : combatTimer.defaultMins; 
+        let secs = info[4] ? parseInt(info[4]) : combatTimer.defaultSecs;
 
         let curPlayer;
 		for(let player of combatTimer.players){
@@ -84,18 +101,23 @@ module.exports = class EditPlayers{
         
         combatTimer.initiativeArray.splice(insertIndex, 0, token);
         
-        if(combatTimer.cTimerInfo.initiativeIndex > insertIndex) {
+        if(combatTimer.initiativeIndex > insertIndex) {
             //if the token was added before the current player, the current player's index is one higher
-            combatTimer.cTimerInfo.initiativeIndex = combatTimer.cTimerInfo.initiativeIndex + 1;
+            combatTimer.initiativeIndex = combatTimer.initiativeIndex + 1;
         }
-        combatTimer.sentMessage.edit(
-            PlayerTimer.makeEmbed(combatTimer)
+
+        push(
+            responses.edit(
+                combatTimer.sentMessage,
+                PlayerTimer.makeEmbed(combatTimer)
+            )
         );
+        console.log(combatTimer.players);
     }
 
-    static removePlayer(info, combatTimer, msg){
-        let curPlayer = combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].player;
-        let curInitiative = combatTimer.initiativeArray[combatTimer.cTimerInfo.initiativeIndex].initiative;
+    static removePlayer(info, combatTimer, msg, push){
+        let curPlayer = combatTimer.initiativeArray[combatTimer.initiativeIndex].player;
+        let curInitiative = combatTimer.initiativeArray[combatTimer.initiativeIndex].initiative;
 
         if(curPlayer.running){  //pause the timer if it is running
             curPlayer.pause();
@@ -126,16 +148,21 @@ module.exports = class EditPlayers{
         }
 
         if(combatTimer.initiativeArray.length === initialLength){   //if its the same length, no players were removed
-            msg.reply(`Player "${info[1]}" was not found in the combat timer.`);
+            push(
+                responses.reply(msg, `Player "${info[1]}" was not found in the combat timer.`)
+            )
             return;
         }
 
         //reset the index in the initiativeArray, as it has changed size
         let newInitiative = combatTimer.initiativeArray.findIndex(element => element.initiative <= curInitiative);
-        combatTimer.cTimerInfo.initiativeIndex = newInitiative >= 0 ? newInitiative : 0;
+        combatTimer.initiativeIndex = newInitiative >= 0 ? newInitiative : 0;
 
-        combatTimer.sentMessage.edit(
-            PlayerTimer.makeEmbed(combatTimer)
+        push(
+            responses.edit(
+                combatTimer.sentMessage,
+                PlayerTimer.makeEmbed(combatTimer)
+            )
         );
     }
 }

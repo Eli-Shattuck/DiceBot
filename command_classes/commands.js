@@ -1,16 +1,16 @@
 const SudokuCommand = require("./sudokuCommand");
 
 module.exports = [
-    new (require('./ilyCommand.js'))(),
-    new (require('./SudokuCommand.js'))(),
-    new (require('./rollCommand.js'))(),
-    new (require('./bazzCommand.js'))(),
-    new (require('./timer_classes/timerCommand.js'))(),
-    new (require('./timer_classes/combatTimerCommand.js'))(),
-    new (require('./luisCommand.js'))(),
-    new (require('./helpCommand.js'))(),
-    new (require('./rubiksCubeCommand.js'))(),
-    new (require('./snakeCommand.js'))(),
-    new (require('./replyCommand.js'))(),
-    new (require('./sayCommand.js'))(),
+    require('./ilyCommand.js'),
+    require('./SudokuCommand.js'),
+    require('./rollCommand.js'),
+    require('./bazzCommand.js'),
+    require('./timer_classes/timerCommand.js'),
+    require('./timer_classes/combatTimerCommand.js'),
+    require('./luisCommand.js'),
+    require('./helpCommand.js'),
+    require('./rubiksCubeCommand.js'),
+    require('./snakeCommand.js'),
+    require('./replyCommand.js'),
+    require('./sayCommand.js')
 ]

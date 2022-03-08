@@ -2,17 +2,17 @@ const Command = require('./command.js');
 const responses = require('../io_classes/responses.js');
 
 module.exports = class ILYCommand extends Command{
-    constructor(){
-        super();
+    constructor(onNewResponse){
+        super(onNewResponse);
     }
 
-    match(msg){
+    static match(msg){
         //console.log(msg.content.toLowerCase());
         return msg.content.toLowerCase().indexOf('--i love you') === 0;
     };
     
     handle(msg){
-        this.responseList.push(responses.reply(msg, 'I love you too <3'));
+        this.push(responses.reply(msg, 'I love you too <3'));
         return;
     };
 }

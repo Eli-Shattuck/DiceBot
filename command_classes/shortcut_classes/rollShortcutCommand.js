@@ -114,7 +114,7 @@ module.exports = class RollShortcutCommand extends Command{
                         toWrite
                     );
                 } catch(err) {
-                    this.error('There was an internal error trying to write to your file.');
+                    console.log('There was an error trying to write to the file.', err);
                     return;
                 }
                 this.push(
@@ -160,7 +160,7 @@ module.exports = class RollShortcutCommand extends Command{
                                         toWrite
                                     );
                                 } catch(err) {
-                                    this.error('There was an internal error trying to write to your file.');
+                                    console.log('There was an error trying to write to the file.', err);
                                     return;
                                 }
                                 reactionHandler.removeAllCallbacks(message); 
@@ -191,7 +191,7 @@ module.exports = class RollShortcutCommand extends Command{
                     toWrite
                 );
             } catch(err) {
-                this.error('There was an internal error trying to write to your file.');
+                console.log('There was an error trying to write to the file.', err);
                 return;
             }
             this.push(responses.reply(msg, "Successfully stored shortcut!"));
@@ -205,7 +205,7 @@ module.exports = class RollShortcutCommand extends Command{
         let title = lines[0].match(RollShortcutCommand.getRollShortReTitle());
 
         if(lines.length > 5){ //only can use 1-9, and each action has 2 commands
-            this.error("You cannot create a shortcut with more than 4 actions.");
+            this.error(msg, "You cannot create a shortcut with more than 4 actions.");
             return;
         }
 
@@ -245,7 +245,7 @@ module.exports = class RollShortcutCommand extends Command{
                 if(sc.name == name[1]) shortcut = sc;
             }
             if(shortcut == undefined){
-                this.error('You have no existing shortcuts with that name.')
+                this.error(msg, 'You have no existing shortcuts with that name.')
             }
         }
         this.creator = msg.author;

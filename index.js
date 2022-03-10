@@ -17,8 +17,11 @@ client.on('messageReactionAdd', (reaction, user) => {
 });
 
 client.on('message', msg => {
-    if(msg.author.bot || msg.content.indexOf('--') !== 0) return;
+    //if(msg.author.bot || msg.content.indexOf('--') !== 0) return;
+    let match = msg.content.match(/(?:```\S*\s+)?(--[\s\S]*)(?:\s*```)?/);
+    if(msg.author.bot || !match ) return;
 
+    msg.content = match[1];
     let p = new Parser(msg);
     p.parse();
     //msg.reply('Hello world!');

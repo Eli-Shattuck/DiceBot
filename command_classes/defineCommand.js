@@ -20,17 +20,20 @@ module.exports = class DefineCommand extends Command {
     }
 
     static getDefineRE() {
-        return /--define\s+(--\S+)\s+(\d)*\s*{([\s\S]*)}/;
+        return /--define\s+(--\S+)\s+(\d*)\s*{([\s\S]*)}/;
     } 
     
     static match(msg){
-        //console.log(msg.content.toLowerCase());
-        return msg.content.indexOf('--define') === 0;
+        //console.log(msg.content);
+        return msg.content.indexOf('--define ') === 0;
+        //return msg.content.match(DefineCommand.getMatchRE());
     };
     
     handle(msg){
         this.msg = msg;
         let matchDefine = msg.content.match(DefineCommand.getDefineRE());
+
+        console.log(matchDefine);
 
         let macroName = matchDefine[1];
         
@@ -39,18 +42,26 @@ module.exports = class DefineCommand extends Command {
         
         let code = matchDefine[3];
         
-        let f = new Function('args', '__parse', code);
+        let f = new Function('args', 'dicebot', code);
+
+        console.log('argc: ' + argc);
 
         let matchRE = macroName+'\\s+(.+)'.repeat(isNaN(argc) ? 0 : argc);
-        DefineCommand.pushMacro({match: (msg)=>msg.content.indexOf(macroName) === 0, handle: (msg) => {
+        DefineCommand.pushMacro({match: (msg)=>msg.content.indexOf(macroName+" ") === 0, handle: (msg) => {
             let args = msg.content.match(matchRE);
             args = args.splice(1, args.length) // only keep args
             console.log(matchRE + " => " + args);
-            f(args, this.parse.bind(this));
+            f(args, this.getDiceBotLib());
         }});
 
         return;
     };
+
+    getDiceBotLib() {
+        return {
+            parse: this.parse.bind(this)
+        };
+    }
 
     parse(str) {
         console.log('parsing{\n'+str+"\n}");

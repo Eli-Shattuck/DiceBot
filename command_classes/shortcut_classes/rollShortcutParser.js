@@ -6,29 +6,47 @@ module.exports = class RollShortcutParser extends Parser{
     constructor(msg, shortcutCommand){
         super(msg);
         this.shortcutCommand = shortcutCommand;
-        this.cmdType = undefined;
+        this.shortcutName;
+        this.cmdType;
+        this.dmgType;
     }
 
-    parse(){
-        this.cmdType = (this.msg.content.indexOf('--roll ') === 0);
+    parse(action){
+        this.shortcutName = action.name;
+        this.cmdType = action.cmdType;
+        this.dmgType = action.dmgType;
         super.parse();
     }
 
     respond(response){
-        if(this.cmdType){
-            let damage = parseInt(response.content);
-            if(isNaN(damage)) return;
+        if(this.cmdType == 'attack'){
+            let attackRoll = parseInt(response.content);
+            if(isNaN(attackRoll)) return;
             this.shortcutCommand.push(
                 responses.reply(
                     response.msg, 
-                    `Your action deals ${damage} damage!`, 
+                    `${this.shortcutName} rolled a ${attackRoll} for their attack!`, 
                     undefined,
                     message => {
                         this.shortcutCommand.sentResponse = message;
                     }
                 )
             )
-        } else {
+        } else if(this.cmdType == 'damage'){
+            let damage = parseInt(response.content);
+            if(isNaN(damage)) return;
+            if(!this.dmgType) this.dmgType = ''; 
+            this.shortcutCommand.push(
+                responses.reply(
+                    response.msg, 
+                    `${this.shortcutName} dealt ${damage} ${this.dmgType} damage!`, 
+                    undefined,
+                    message => {
+                        this.shortcutCommand.sentResponse = message;
+                    }
+                )
+            )
+        } else if(this.cmdType == 'save'){
             this.shortcutCommand.push(
                 responses.reply(
                     response.msg, 
@@ -39,6 +57,8 @@ module.exports = class RollShortcutParser extends Parser{
                     }
                 )
             )
+        } else {
+            this.shortcutCommand.push(response);
         }
     }
 }

@@ -28,16 +28,12 @@ module.exports = class RollShortcutCommand extends Command{
         return /--roll-shortcut\s+fetch\s+(.+)/;
     }
 
-    static getFilePath(user){
+    static getPlayerFilePath(user){
         return `./command_classes/shortcut_classes/shortcut_data/user${user.id}.json`;
     }
 
-    static match(msg){
-        return msg.content.indexOf('--roll-shortcut ') === 0;
-    }
-
-    handle(msg){
-        let filePath = RollShortcutCommand.getFilePath(msg.author);
+    static getPlayerShortcuts(user){
+        let filePath = RollShortcutCommand.getPlayerFilePath(user);
         let playerShortcuts = [];
         try{
             playerShortcuts = JSON.parse(
@@ -52,6 +48,24 @@ module.exports = class RollShortcutCommand extends Command{
         } catch(err) {
             console.log('Did not find existing file')
         }
+        return playerShortcuts;
+    }
+
+    static match(msg){
+        return msg.content.indexOf('--roll-shortcut ') === 0;
+    }
+
+    handle(msg){
+        let fetch = msg.content.match(RollShortcutCommand.getRollShortReFetch());
+        if(fetch){
+            this.openShortcut(msg, undefined, fetch);
+        } else {
+            this.newShortcut(msg);
+        }
+    }
+
+    newShortcut(msg){
+        let playerShortcuts = RollShortcutCommand.getPlayerShortcuts(msg.author);
 
         let shortcut = this.makeShortcut(msg);
         if(!shortcut) return;
@@ -77,7 +91,10 @@ module.exports = class RollShortcutCommand extends Command{
                                 playerShortcuts[oldShortcutIndex] = shortcut;
                                 try{
                                     let toWrite = JSON.stringify({data: playerShortcuts});
-                                    fs.writeFileSync(filePath, toWrite);
+                                    fs.writeFileSync(
+                                        RollShortcutCommand.getPlayerFilePath(msg.author), 
+                                        toWrite
+                                    );
                                 } catch(err) {
                                     console.log('Unable to write to file', err);
                                     return;
@@ -104,7 +121,10 @@ module.exports = class RollShortcutCommand extends Command{
             playerShortcuts.push(shortcut);
             try{
                 let toWrite = JSON.stringify({data: playerShortcuts});
-                fs.writeFileSync(filePath, toWrite);
+                fs.writeFileSync(
+                    RollShortcutCommand.getPlayerFilePath(msg.author), 
+                    toWrite
+                );
             } catch(err) {
                 console.log('Unable to write to file', err);
                 return;
@@ -150,28 +170,13 @@ module.exports = class RollShortcutCommand extends Command{
         }
     }
 
-    openShortcut(msg, shortcut) {
+    openShortcut(msg, shortcut, name) {
         if(shortcut == undefined) {
-            try{
-                playerShortcuts = JSON.parse(
-                    fs.readFileSync(filePath, 'utf-8', (err, data) => {
-                        if (err) {
-                            throw err;
-                        }
-                        console.log(data);
-                    })
-                ).data;
-                console.log(playerShortcuts);
-            } catch(err) {
-                this.error(`You have no existing shortcuts.`);
-                return;
-            }
-            let name = msg.content.match(RollShortcutCommand.getRollShortReFetch());
+            let playerShortcuts = RollShortcutCommand.getPlayerShortcuts(msg.author);
 
             for(let sc of playerShortcuts){
                 if(sc.name == name[1]) shortcut = sc;
             }
-
             if(shortcut == undefined){
                 this.error('You have no existing shortcuts with that name.')
             }
@@ -186,20 +191,32 @@ module.exports = class RollShortcutCommand extends Command{
             .setTitle(shortcut.name)
             .setFooter(`Created by ${msg.author.username}`)
         let i = 1;
-        let actions = []; //array of strings that are commands
+        let actions = []; //array of objects with command type and string
         for(let action in shortcut){
             if(action == 'name') continue;
             messageEmbed.addField('``` Action Name ```', action, true);
             if(shortcut[action].attackRoll){
                 messageEmbed.addField('```' + i + ': Attack Roll```', shortcut[action].attackRoll, true);
-                actions[i++] = '--roll ' + shortcut[action].attackRoll + ' -sum';
+                actions[i++] = {
+                    name: shortcut.name, 
+                    cmdType: 'attack', 
+                    cmd: '--roll ' + shortcut[action].attackRoll + ' -sum'
+                };
             } else if(shortcut[action].saveThrow){
                 messageEmbed.addField('```' + i + ': Saving Throw```', shortcut[action].saveThrow, true);
-                actions[i++] = '--reply Make a ' + shortcut[action].saveThrow + ' saving throw';
+                actions[i++] = {
+                    cmdType: 'save', 
+                    cmd: '--reply Make a ' + shortcut[action].saveThrow + ` saving throw for ${shortcut.name}`
+                };
             }
             let type = shortcut[action].damageType ? ' ' + shortcut[action].damageType : "";
             messageEmbed.addField('```' + i + ': Damage Roll```', shortcut[action].damageRoll + type, true);
-            actions[i++] = '--roll ' + shortcut[action].damageRoll + ' -sum';
+            actions[i++] = {
+                name: shortcut.name, 
+                cmdType: 'damage', 
+                cmd: '--roll ' + shortcut[action].damageRoll + ' -sum',
+                dmgType: shortcut[action].damageType
+            };
         }
 
         console.log(actions);
@@ -220,6 +237,7 @@ module.exports = class RollShortcutCommand extends Command{
                             let actionIndex = NUMS.findIndex(elt => elt.id === reaction.emoji.id);
                             if(this.sentResponse) this.sentResponse.delete();
                             this.parse(msg, actions[actionIndex]);
+                            reaction.users.remove(user.id);
                         }
                     );
                 }
@@ -227,13 +245,12 @@ module.exports = class RollShortcutCommand extends Command{
         )
     }
 
-    parse(msg, str) {
-        console.log('parsing{\n'+str+'\n}');
+    parse(msg, action) {
         let oldContent = msg.content;
-        msg.content = str;
+        msg.content = action.cmd;
         let Parser = require('./rollShortcutParser.js');
         let p = new Parser(msg, this);
-        p.parse(); 
+        p.parse(action); 
         msg.content = oldContent;       
     }
 }

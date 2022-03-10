@@ -19,13 +19,15 @@ module.exports = class RollShortcutParser extends Parser{
     }
 
     respond(response){
+        let send = this.shortcutCommand.sentResponse ? responses.edit : responses.message;
+        let msg = this.shortcutCommand.sentResponse ? this.shortcutCommand.sentResponse : response.msg;
         if(this.cmdType == 'attack'){
             let attackRoll = parseInt(response.content);
             if(isNaN(attackRoll)) return;
             this.shortcutCommand.push(
-                responses.reply(
-                    response.msg, 
-                    `${this.shortcutName} rolled a ${attackRoll} for their attack!`, 
+                send(
+                    msg, 
+                    `${this.shortcutCommand.creator}, ${this.shortcutName} rolled a ${attackRoll} for their attack!`, 
                     undefined,
                     message => {
                         this.shortcutCommand.sentResponse = message;
@@ -37,9 +39,9 @@ module.exports = class RollShortcutParser extends Parser{
             if(isNaN(damage)) return;
             if(!this.dmgType) this.dmgType = ''; 
             this.shortcutCommand.push(
-                responses.reply(
-                    response.msg, 
-                    `${this.shortcutName} dealt ${damage} ${this.dmgType} damage!`, 
+                send(
+                    msg, 
+                    `${this.shortcutCommand.creator}, ${this.shortcutName} deals ${damage} ${this.dmgType} damage!`, 
                     undefined,
                     message => {
                         this.shortcutCommand.sentResponse = message;
@@ -48,9 +50,9 @@ module.exports = class RollShortcutParser extends Parser{
             )
         } else if(this.cmdType == 'save'){
             this.shortcutCommand.push(
-                responses.reply(
-                    response.msg, 
-                    response.content, 
+                send(
+                    msg, 
+                    `${this.shortcutCommand.creator}, ` + response.content, 
                     undefined,
                     message => {
                         this.shortcutCommand.sentResponse = message;

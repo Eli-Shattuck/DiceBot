@@ -13,7 +13,7 @@ module.exports = class SnakeCommand extends Command{
     
     handle(msg){
         //console.log('-----NEW MESSAGE-----');
-        msg.content = msg.content.substring('--sn '.length);
+        msg.content = msg.content.substring('--sn '.length).trim();
         const Snarser = require('./snarser.js');
         //console.log(Snarser);
         let s = new Snarser(msg);

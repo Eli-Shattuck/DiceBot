@@ -1,0 +1,1 @@
+{"data":[{"name":"test2","balls1":{"attackRoll":"d20 +3","damageRoll":"3d3"},"balls2":{"attackRoll":"d20 +6","damageRoll":"6d8"},"make a save!":{"saveThrow":"DC18WIS","damageRoll":"5d8+4"}}]}

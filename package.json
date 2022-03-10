@@ -13,6 +13,7 @@
   "dependencies": {
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
+    "jsonlines": "^0.1.1",
     "matplotlib": "^1.0.0",
     "number-to-words": "^1.2.4",
     "prompt": "^1.2.0",

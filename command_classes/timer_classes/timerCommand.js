@@ -37,7 +37,7 @@ module.exports = class TimerCommand extends Command{
 
         this.push(
             responses.message(
-                msg.channel,
+                msg,
                 t.formatTimeString(),
                 undefined,
                 message => {

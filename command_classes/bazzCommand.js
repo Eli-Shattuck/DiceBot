@@ -16,7 +16,7 @@ module.exports = class BazzCommand extends Command{
         for(let i = 1; i <= 20; i++) {
             this.push(
                 responses.message(
-                    msg.channel, 
+                    msg, 
                     `./command_classes/bazz/baz-${i}.png`, 
                     {files: [`./command_classes/bazz/baz-${i}.png`]}
                 )

@@ -364,7 +364,7 @@ module.exports = class RubiksCubeCommand extends Command{
         //console.log(Cube.getNet());
         this.push(
             responses.message(
-                msg.channel,
+                msg,
                 rc.toString(),
                 undefined,
                 message => {

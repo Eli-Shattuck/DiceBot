@@ -34,9 +34,9 @@ module.exports = class Parser{
 
     sendMessage(response){
         if(response.thenLambda){
-            response.channel.send(response.content, response.attachment).then(response.thenLambda)
+            response.msg.channel.send(response.content, response.attachment).then(response.thenLambda)
         } else {
-            response.channel.send(response.content, response.attachment)
+            response.msg.channel.send(response.content, response.attachment)
         }
     }
 

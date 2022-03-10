@@ -51,7 +51,7 @@ module.exports = class HelpCommand extends Command{
 
         this.push(
             responses.message(
-                msg.channel,
+                msg,
                 this.makeEmbed(),
                 undefined,
                 message => {

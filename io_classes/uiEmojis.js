@@ -57,10 +57,12 @@ const SEVEN    = new UIEmoji("label_seven", "944050179902947398");
 const EIGHT    = new UIEmoji("label_eight", "944050179705815061");
 const NINE     = new UIEmoji("label_nine",  "944050179848421426");
 
+const YES      = new UIEmoji("yes",         "950911787535052820");
+
 module.exports = {
     PLAY, PAUSE, NEXT, PREVIOUS, INCREASE, DECREASE, STOP, TRASH,
     ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE,
     NUMS: [ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE],
     BACK, DOWN, FRONT, LEFT, RIGHT, UP, SHUFFLE, CW, CCW, SORT,
-    TRANS
+    TRANS, YES
 };

@@ -13,7 +13,7 @@ module.exports = class LuisCommand extends Command{
     
     handle(msg){
         let user = msg.guild.members.cache.random();
-        this.push(responses.message(msg.channel, `I love you ${user}! ~Luis ❤️`));
+        this.push(responses.message(msg, `I love you ${user}! ~Luis ❤️`));
         return;
     };
 }

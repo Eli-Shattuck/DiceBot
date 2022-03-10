@@ -1,3 +1,5 @@
+const responses = require('../io_classes/responses.js');
+
 module.exports = class Command{
     constructor(onNewResponse){
         this.onNewResponse = onNewResponse;

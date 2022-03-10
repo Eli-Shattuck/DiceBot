@@ -38,22 +38,22 @@ module.exports = class DefineCommand extends Command {
         argc = parseInt(argc);
         
         let code = matchDefine[3];
-
-        //let args = ['1', '2'];
+        
         let f = new Function('args', '__parse', code);
 
         let matchRE = macroName+'\\s+(.+)'.repeat(isNaN(argc) ? 0 : argc);
         DefineCommand.pushMacro({match: (msg)=>msg.content.indexOf(macroName) === 0, handle: (msg) => {
-            let match = msg.content.match(matchRE);
-            
+            let args = msg.content.match(matchRE);
+            args = args.splice(1, args.length) // only keep args
+            console.log(matchRE + " => " + args);
+            f(args, this.parse.bind(this));
         }});
-        //f(args, this.parse.bind(this));
 
         return;
     };
 
     parse(str) {
-        //console.log('parsing\n'+str);
+        console.log('parsing{\n'+str+"\n}");
         let oldContent = this.msg.content;
         this.msg.content = str;
         if(!Parser) Parser = require('../parser.js');

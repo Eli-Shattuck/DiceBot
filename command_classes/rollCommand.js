@@ -112,7 +112,7 @@ module.exports = class RollCommand extends Command{
     }
 
     static match(msg){
-        return msg.content.indexOf('--roll') === 0;
+        return msg.content.indexOf('--roll ') === 0;
     }
 
     handle(msg){
@@ -137,7 +137,7 @@ module.exports = class RollCommand extends Command{
         if(options) dis = options.find( elt => elt.name==='-dis' );
 
         this.push(
-            responses.message(msg.channel, `${msg.author} is rolling...`)
+            responses.message(msg, `${msg.author} is rolling...`)
         );
 
         for(let i = 0; i < loopSize; i++) {
@@ -164,7 +164,7 @@ module.exports = class RollCommand extends Command{
             for(let res of results) {
                 this.push(
                     responses.message(
-                        msg.channel,
+                        msg,
                         `./command_classes/bazz/baz-${res}.png`, 
                         { files: [`./command_classes/bazz/baz-${res}.png`] }
                         )
@@ -176,7 +176,7 @@ module.exports = class RollCommand extends Command{
                 toSend += res + "\n";
             }
             this.push(
-                responses.message(msg.channel, toSend)
+                responses.message(msg, toSend)
             );
         }
         if(extraLines) {
@@ -185,7 +185,7 @@ module.exports = class RollCommand extends Command{
                 toSend += line + "\n";
             }
             this.push(
-                responses.message(msg.channel, toSend)
+                responses.message(msg, toSend)
             );
         }
     }

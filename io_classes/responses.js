@@ -1,8 +1,6 @@
-const Discord = require('discord.js');
-
 module.exports = {
-    message: (channel, content, attachment, thenLambda) => {
-        return {isMessage: true, channel, content, attachment, thenLambda}
+    message: (msg, content, attachment, thenLambda) => {
+        return {isMessage: true, msg, content, attachment, thenLambda}
     },
 
     reply: (msg, content, attachment, thenLambda) => {

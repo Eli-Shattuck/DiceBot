@@ -12,7 +12,7 @@ module.exports = class SayCommand extends Command{
     };
     
     handle(msg){
-        this.push(responses.message(msg.channel, msg.content.substring('--say '.length)));
+        this.push(responses.message(msg, msg.content.substring('--say '.length)));
         return;
     };
 }

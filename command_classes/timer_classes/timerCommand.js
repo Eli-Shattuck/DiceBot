@@ -21,7 +21,7 @@ module.exports = class TimerCommand extends Command{
     }
 
     static match(msg){
-        return msg.content.indexOf('--timer') === 0;
+        return TimerCommand.validate(msg.content, '--timer');
     }
     
     handle(msg){

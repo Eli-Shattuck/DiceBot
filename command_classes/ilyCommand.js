@@ -7,11 +7,11 @@ module.exports = class ILYCommand extends Command{
     }
 
     static match(msg){
-        return msg.content.toLowerCase().indexOf('--i love you') === 0;
-    };
+        return ILYCommand.validate(msg.content.toLowerCase(), '--i love you');
+    }
     
     handle(msg){
         this.push(responses.reply(msg, 'I love you too <3'));
         return;
-    };
+    }
 }

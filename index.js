@@ -18,7 +18,8 @@ client.on('messageReactionAdd', (reaction, user) => {
 
 client.on('message', msg => {
     //if(msg.author.bot || msg.content.indexOf('--') !== 0) return;
-    let match = msg.content.match(/(?:```\S*\s+)?(--[\s\S]*)(?:\s*```)?/);
+    let match = msg.content.match(/(?:```\S*\s+)(--[\S\s]*)(?:\s*```)/);
+    if(!match) match = msg.content.match(/(--[\S\s]*)/);
     if(msg.author.bot || !match ) return;
 
     msg.content = match[1];

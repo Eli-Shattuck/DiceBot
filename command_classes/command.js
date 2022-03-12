@@ -5,6 +5,10 @@ module.exports = class Command{
         this.onNewResponse = onNewResponse;
     }
 
+    static validate(content, name){
+        return content.match(`^${name}(?:[\\s]+[\\S\\s]*|$)`);
+    }
+
     static match(msg){}
 
     handle(msg){}

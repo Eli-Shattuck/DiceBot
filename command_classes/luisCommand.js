@@ -8,7 +8,7 @@ module.exports = class LuisCommand extends Command{
 
     static match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf('--luis') === 0;
+        return LuisCommand.validate(msg.content, '--luis');
     };
     
     handle(msg){

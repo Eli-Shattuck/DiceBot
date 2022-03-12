@@ -8,7 +8,6 @@ let globalMacros = [];
 module.exports = class DefineCommand extends Command {
     constructor(onNewResponse){
         super(onNewResponse);
-        this.msg;
     }
 
     static pushMacro(macro) {
@@ -24,13 +23,12 @@ module.exports = class DefineCommand extends Command {
     } 
     
     static match(msg){
-        //console.log(msg.content);
-        return msg.content.indexOf('--define ') === 0;
+        console.log(msg.content);
+        return DefineCommand.validate(msg.content, '--define');
         //return msg.content.match(DefineCommand.getMatchRE());
     };
     
     handle(msg){
-        this.msg = msg;
         let matchDefine = msg.content.match(DefineCommand.getDefineRE());
 
         console.log(matchDefine);
@@ -47,29 +45,29 @@ module.exports = class DefineCommand extends Command {
         console.log('argc: ' + argc);
 
         let matchRE = macroName+'\\s+(.+)'.repeat(isNaN(argc) ? 0 : argc);
-        DefineCommand.pushMacro({match: (msg)=>msg.content.indexOf(macroName+" ") === 0, handle: (msg) => {
-            let args = msg.content.match(matchRE);
+        DefineCommand.pushMacro({match: (message) => DefineCommand.validate(message.content, macroName), handle: (message) => {
+            let args = message.content.match(matchRE);
             args = args.splice(1, args.length) // only keep args
             console.log(matchRE + " => " + args);
-            f(args, this.getDiceBotLib());
+            try{
+                f(args, {
+                    parse: (str) => { this.parse(str, message); }
+                });
+            } catch (e) {
+                this.push(responses.message(message, `JS runtime error: [${e}]`));
+            }
         }});
 
         return;
     };
 
-    getDiceBotLib() {
-        return {
-            parse: this.parse.bind(this)
-        };
-    }
-
-    parse(str) {
+    parse(str, message) {
         console.log('parsing{\n'+str+"\n}");
-        let oldContent = this.msg.content;
-        this.msg.content = str;
+        let oldContent = message.content;
+        message.content = str;
         if(!Parser) Parser = require('../parser.js');
-        let p = new Parser(this.msg);
+        let p = new Parser(message);
         p.parse(); 
-        this.msg.content = oldContent;       
+        message.content = oldContent;       
     }
 }

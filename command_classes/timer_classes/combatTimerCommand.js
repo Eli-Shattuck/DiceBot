@@ -57,7 +57,7 @@ module.exports = class CombatTimerCommand extends Command{
 
 
     static match(msg){
-        return msg.content.indexOf('--combat-timer') === 0;
+        return CombatTimerCommand.validate(msg.content, '--combat-timer');
     }
 
     handle(msg){

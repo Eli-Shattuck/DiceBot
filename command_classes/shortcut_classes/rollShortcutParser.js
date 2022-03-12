@@ -6,13 +6,12 @@ module.exports = class RollShortcutParser extends Parser{
     constructor(msg, shortcutCommand){
         super(msg);
         this.shortcutCommand = shortcutCommand;
-        this.shortcutName;
+        this.shortcutName = shortcutCommand.shortcut.name;
         this.cmdType;
         this.dmgType;
     }
 
     parse(action){
-        this.shortcutName = action.name;
         this.cmdType = action.cmdType;
         this.dmgType = action.dmgType;
         super.parse();
@@ -30,7 +29,7 @@ module.exports = class RollShortcutParser extends Parser{
                     `${this.shortcutCommand.creator}, ${this.shortcutName} rolled a ${attackRoll} for their attack!`, 
                     undefined,
                     message => {
-                        this.shortcutCommand.sentResponse = message;
+                        if(!this.shortcutCommand.sentResponse) this.shortcutCommand.sentResponse = message;
                     }
                 )
             )
@@ -44,7 +43,7 @@ module.exports = class RollShortcutParser extends Parser{
                     `${this.shortcutCommand.creator}, ${this.shortcutName} deals ${damage} ${this.dmgType} damage!`, 
                     undefined,
                     message => {
-                        this.shortcutCommand.sentResponse = message;
+                        if(!this.shortcutCommand.sentResponse) this.shortcutCommand.sentResponse = message;
                     }
                 )
             )
@@ -55,7 +54,7 @@ module.exports = class RollShortcutParser extends Parser{
                     `${this.shortcutCommand.creator}, ` + response.content, 
                     undefined,
                     message => {
-                        this.shortcutCommand.sentResponse = message;
+                        if(!this.shortcutCommand.sentResponse) this.shortcutCommand.sentResponse = message;
                     }
                 )
             )

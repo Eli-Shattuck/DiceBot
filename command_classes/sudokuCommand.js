@@ -16,7 +16,7 @@ module.exports = class SudokuCommand extends Command {
     }
 
     static match(msg){
-        return msg.content.indexOf('--sudoku') === 0;//msg.content.match(SudokuCommand.getSudokuRe()); //regex match
+      return SudokuCommand.validate(msg.content, '--sudoku');
     }
 
     handle(msg){

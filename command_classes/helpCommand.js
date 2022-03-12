@@ -21,7 +21,7 @@ module.exports = class HelpCommand extends Command{
 
     static match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf('--help') === 0;
+        return HelpCommand.validate(msg.content, '--help');
     };
     
     handle(msg){

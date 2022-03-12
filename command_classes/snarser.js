@@ -81,16 +81,18 @@ function snake(content) {
 }
 
 module.exports = class Snarser extends Parser {
-    constructor(snessage){
+    constructor(snessage, snammand){
         super(snessage);
+        this.snammand = snammand;
     }
 
     snarse() {this.parse();}
 
     respond(response) {
         response.content = snake(response.content);
-        super.respond(
-            response
-        )
+        // super.respond(
+        //     response
+        // )
+        this.snammand.push(response);
     }
 };

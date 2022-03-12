@@ -356,7 +356,7 @@ module.exports = class RubiksCubeCommand extends Command{
 
     static match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf("--rubik's") === 0;
+        return RubiksCubeCommand.validate(msg.content, "--rubik's");
     };
     
     handle(msg){

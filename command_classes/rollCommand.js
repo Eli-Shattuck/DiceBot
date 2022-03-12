@@ -112,7 +112,7 @@ module.exports = class RollCommand extends Command{
     }
 
     static match(msg){
-        return msg.content.indexOf('--roll ') === 0;
+        return RollCommand.validate(msg.content, '--roll');
     }
 
     handle(msg){

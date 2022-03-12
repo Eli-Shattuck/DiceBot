@@ -8,7 +8,7 @@ module.exports = class SnakeCommand extends Command{
 
     static match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf('--sn ') === 0;
+        return SnakeCommand.validate(msg.content, '--sn');
     };
     
     handle(msg){
@@ -16,7 +16,7 @@ module.exports = class SnakeCommand extends Command{
         msg.content = msg.content.substring('--sn '.length).trim();
         const Snarser = require('./snarser.js');
         //console.log(Snarser);
-        let s = new Snarser(msg);
+        let s = new Snarser(msg, this);
         s.snarse();        
     };
 }

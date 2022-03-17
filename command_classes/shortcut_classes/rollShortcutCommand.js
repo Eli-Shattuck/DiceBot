@@ -282,7 +282,7 @@ module.exports = class RollShortcutCommand extends Command{
                 messageEmbed.addField('``` ' + i + ': Saving Throw ```', '⠀' + this.shortcut[action].saveThrow, true);
                 actions[i++] = {
                     cmdType: 'save', 
-                    cmd: '--reply Make a ' + this.shortcut[action].saveThrow + ` saving throw for ${shortcut.name}`
+                    cmd: '--reply Make a ' + this.shortcut[action].saveThrow + ` saving throw for ${this.shortcut.name}`
                 };
             }
             let type = this.shortcut[action].damageType ? ' ' + this.shortcut[action].damageType : "";

@@ -9,7 +9,7 @@ module.exports = class MacroCommand extends Command {
 
     static match(msg){
         //console.log(msg.content.toLowerCase());
-        for(let macro of DefineCommand.getMacros())
+        for(let macro of DefineCommand.getMacros(msg.author))
             if(macro.match(msg)) {
                 return true;
             }
@@ -18,7 +18,7 @@ module.exports = class MacroCommand extends Command {
     
     handle(msg){
         let found;
-        for(let macro of DefineCommand.getMacros())
+        for(let macro of DefineCommand.getMacros(msg.author))
             if(macro.match(msg)) {
                 found = macro;
                 break;

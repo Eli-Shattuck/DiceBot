@@ -10,11 +10,13 @@ module.exports = class DefineCommand extends Command {
         super(onNewResponse);
     }
 
-    static pushMacro(macro) {
+    static pushMacro(user, macro) {
+        console.log("push_macro: ", user.id);
         globalMacros.push(macro);
     }
 
-    static getMacros() {
+    static getMacros(user) {
+        console.log("get_macro: ", user.id);
         return globalMacros;
     }
 
@@ -23,7 +25,7 @@ module.exports = class DefineCommand extends Command {
     } 
     
     static match(msg){
-        console.log(msg.content);
+        //console.log(msg.content);
         return DefineCommand.validate(msg.content, '--define');
         //return msg.content.match(DefineCommand.getMatchRE());
     };
@@ -31,7 +33,7 @@ module.exports = class DefineCommand extends Command {
     handle(msg){
         let matchDefine = msg.content.match(DefineCommand.getDefineRE());
 
-        console.log(matchDefine);
+        //console.log(matchDefine);
 
         let macroName = matchDefine[1];
         
@@ -41,28 +43,30 @@ module.exports = class DefineCommand extends Command {
         let code = matchDefine[3];
         
         let f = new Function('args', 'dicebot', code);
-
-        console.log('argc: ' + argc);
+        //console.log('argc: ' + argc);
 
         let matchRE = macroName+'\\s+(.+)'.repeat(isNaN(argc) ? 0 : argc);
-        DefineCommand.pushMacro({match: (message) => DefineCommand.validate(message.content, macroName), handle: (message) => {
-            let args = message.content.match(matchRE);
-            args = args.splice(1, args.length) // only keep args
-            console.log(matchRE + " => " + args);
-            try{
-                f(args, {
-                    parse: (str) => { this.parse(str, message); }
-                });
-            } catch (e) {
-                this.push(responses.message(message, `JS runtime error: [${e}]`));
-            }
-        }});
+        DefineCommand.pushMacro(msg.author, 
+            {match: (message) => DefineCommand.validate(message.content, macroName), 
+            handle: (message) => {
+                let args = message.content.match(matchRE);
+                args = args.splice(1, args.length) // only keep args
+                //console.log(matchRE + " => " + args);
+                try{
+                    f(args, {
+                        parse: (str) => { this.parse(str, message); }
+                    });
+                } catch (e) {
+                    this.push(responses.message(message, `JS runtime error: [${e}]`));
+                }
+            }}
+        );
 
         return;
     };
 
     parse(str, message) {
-        console.log('parsing{\n'+str+"\n}");
+        //console.log('parsing{\n'+str+"\n}");
         let oldContent = message.content;
         message.content = str;
         if(!Parser) Parser = require('../parser.js');

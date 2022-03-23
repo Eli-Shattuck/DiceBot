@@ -13,7 +13,7 @@ module.exports = [
     require('./snakeCommand.js'),
     require('./replyCommand.js'),
     require('./sayCommand.js'),
-    require('./defineCommand.js'),
-    require('./macroCommand.js'),
+    require('./define_classes/defineCommand.js'),
+    require('./define_classes/macroCommand.js'),
     require('./shortcut_classes/rollShortcutCommand.js')
 ]

@@ -1,6 +1,6 @@
-const Command = require('./command.js');
+const Command = require('../command.js');
 const DefineCommand = require('./defineCommand.js');
-const responses = require('../io_classes/responses.js');
+const responses = require('../../io_classes/responses.js');
 
 module.exports = class MacroCommand extends Command {
     constructor(onNewResponse){

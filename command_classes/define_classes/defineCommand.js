@@ -1,6 +1,11 @@
 const Command = require('../command.js');
 const responses = require('../../io_classes/responses.js');
 const fs = require('fs');
+const UIEmojis = require('../../io_classes/uiEmojis.js');
+const reactionHandler = require('../../io_classes/reactionHandler.js');
+
+const YES = UIEmojis.YES;
+const STOP = UIEmojis.STOP;
 
 let Parser = undefined;
 
@@ -33,17 +38,114 @@ module.exports = class DefineCommand extends Command {
         return userMacros;
     }
 
+    static getDefineRE() {
+        return /--define\s+(--\S+)\s+(\d*)\s*{([\s\S]*)}/;
+    }
+    
+    static getDefineShowAllRE() {
+        return /--define\s+show\s+all/;
+    }
+
+    static getDefineInspectRE() {
+        return /--define\s+inspect\s+(--\S+)/;
+    }
+
+    static getDefineDeleteRE() {
+        return /--define\s+delete\s+(--\S+)/;
+    }
+    
+    static match(msg){
+        //console.log(msg.content);
+        return DefineCommand.validate(msg.content, '--define');
+        //return msg.content.match(DefineCommand.getMatchRE());
+    };
+    
+    handle(msg){
+        let matchDefine = msg.content.match(DefineCommand.getDefineRE());
+        let matchShowAll = msg.content.match(DefineCommand.getDefineShowAllRE());
+        let matchInspect = msg.content.match(DefineCommand.getDefineInspectRE());
+        let matchDelete = msg.content.match(DefineCommand.getDefineDeleteRE());
+        if(matchDefine){
+            this.defineNew(msg, matchDefine);
+        } else if(matchShowAll) {
+            this.showAll(msg);
+        } else if(matchInspect) {
+            this.inspectMacro(msg, matchInspect);
+        } else if(matchDelete) {
+            this.deleteMacro(msg, matchDelete);
+        } else { 
+            this.error(msg, "Your command did not match the expected format.");
+            return;
+        }
+    };
+
+    defineNew(msg, matchDefine){
+        let macroName = matchDefine[1];
+        
+        let argc = matchDefine[2];
+        argc = parseInt(argc);
+        
+        let code = matchDefine[3];
+        
+        this.pushMacro(msg, 
+            {
+                "name" : macroName,
+                "argc" : argc,
+                "code" : code
+            }
+        );
+        return;
+    }
+
     pushMacro(msg, newMacro) {
         let userMacros = DefineCommand.getMacros(msg.author);
-        for(let macro in userMacros){
-            if(macro.name == newMacro.name){
+        //console.log("UserMacros:", userMacros);
+        for(let i in userMacros){
+            //console.log("macro", macro, "\nnewMacro", newMacro);
+            if(userMacros[i]["name"] == newMacro["name"]){
                 this.push(
-                    responses.reply(msg, "You have an existing macro with that name.")
+                    responses.reply(
+                        msg, 
+                        `You have an existing macro with the name ${newMacro["name"]}. Would you like to replace it?`,
+                        undefined,
+                        message => {
+                            reactionHandler.addCallback(
+                                [YES],
+                                message,
+                                (reaction, user) => {
+                                    userMacros[i] = newMacro;
+                                    try{
+                                        let toWrite = JSON.stringify({data: userMacros});
+                                        fs.writeFileSync(
+                                            DefineCommand.getUserFilePath(msg.author),  
+                                            toWrite
+                                        );
+                                    } catch(err) {
+                                        console.log('There was an error trying to write to the file.', err);
+                                        return;
+                                    }
+                                    reactionHandler.removeAllCallbacks(message); 
+                                    message.delete();
+                                    this.push(responses.reply(msg, "Your macro has been modified."));
+                                }
+                            )
+                            reactionHandler.addCallback(
+                                [STOP],
+                                message,
+                                (reaction, user) => {
+                                    reactionHandler.removeAllCallbacks(message); 
+                                    message.delete();
+                                    this.push(responses.reply(msg, "Your macro has not been changed."));
+                                }
+                            );
+                            reactionHandler.addReactions([YES, STOP], message);
+                        }
+                    )
                 );
                 return;
             }
         }
-        console.log("newMacro: ", JSON.stringify(newMacro));
+        //console.log("newMacro: ", JSON.stringify(newMacro));
         userMacros.push(newMacro);
         try{
             let toWrite = JSON.stringify({data: userMacros});
@@ -55,70 +157,77 @@ module.exports = class DefineCommand extends Command {
             console.log('There was an error trying to write to the file.', err);
             return;
         }
-        console.log("User macros successfully updated.");
+        //console.log("User macros successfully updated.");
         this.push(
             responses.reply(msg, "Your macro has been stored.")
         );
     }
 
-    static getDefineRE() {
-        return /--define\s+(--\S+)\s+(\d*)\s*{([\s\S]*)}/;
-    } 
-    
-    static match(msg){
-        //console.log(msg.content);
-        return DefineCommand.validate(msg.content, '--define');
-        //return msg.content.match(DefineCommand.getMatchRE());
-    };
-    
-    handle(msg){
-        let matchDefine = msg.content.match(DefineCommand.getDefineRE());
+    showAll(msg){
+        let userMacros = DefineCommand.getMacros(msg.author);
+        let toWrite = "You have the following macros:";
+        for(let macro of userMacros){
+            toWrite += `\n${macro["name"]}`;
+        }
+        toWrite += "\nYou can inspect any of these macros by typing --define inspect `macroName`, or delete it with --define delete `macroName`"
+        this.push(responses.reply(msg, toWrite));
+    }
 
-        if(!matchDefine){
-            this.error(msg, "Your command did not match the expected format.");
+    inspectMacro(msg, matchInspect){
+        let macroName = matchInspect[1];
+        let userMacros = DefineCommand.getMacros(msg.author);
+        let found;
+        for(let macro of userMacros){
+            if(macro["name"] == macroName){
+                found = macro;
+                break;
+            }
+        }
+        if(!found){
+            this.push(responses.reply(msg, "You do not have a macro with that name. Try --define show all to see your macros."));
             return;
         }
-        //console.log(matchDefine);
 
-        let macroName = matchDefine[1];
-        
-        let argc = matchDefine[2];
-        argc = parseInt(argc);
-        
-        let code = matchDefine[3];
-        
-        let f = new Function('args', 'dicebot', code);
-        //console.log('argc: ' + argc);
+        let num = isNaN(parseInt(found["argc"])) ? 0 : found["argc"];
+        let toWrite = `Your macro ${found["name"]} takes ${num} arguments, and runs the following code:\n`;
+        toWrite += `\`\`\`${found["code"]}\`\`\``;
+        this.push(responses.reply(msg, toWrite));
+    }
 
-        let matchRE = macroName+'\\s+(.+)'.repeat(isNaN(argc) ? 0 : argc);
-        this.pushMacro(msg, 
-            {   name: macroName,
-                match: (message) => DefineCommand.validate(message.content, macroName), 
-                handle: (message) => {
-                    let args = message.content.match(matchRE);
-                    args = args.splice(1, args.length) // only keep args
-                    //console.log(matchRE + " => " + args);
-                    try{
-                        f(args, {
-                            parse: (str) => { this.parse(str, message); }
-                        });
-                    } catch (e) {
-                        this.push(responses.message(message, `JS runtime error: [${e}]`));
-                    }
+    deleteMacro(msg, matchDelete){
+        let toDelete = matchDelete[1];
+        let userMacros = DefineCommand.getMacros(msg.author);
+        let initialLen = userMacros.length;
+        if(initialLen > 0){
+            for(let i = 0; i < initialLen; i++){
+                if(userMacros[i]["name"] == toDelete){
+                    userMacros.splice(i, 1);
+                    break;
                 }
             }
-        );
-
-        return;
-    };
-
-    parse(str, message) {
-        //console.log('parsing{\n'+str+"\n}");
-        let oldContent = message.content;
-        message.content = str;
-        if(!Parser) Parser = require('../../parser.js');
-        let p = new Parser(message);
-        p.parse(); 
-        message.content = oldContent;       
+            if(userMacros.length == initialLen){
+                this.push(
+                    responses.reply(msg, `You have no existing macros with the name "${toDelete}".`)
+                )
+            } else {
+                try{
+                    let toWrite = JSON.stringify({data: userMacros});
+                    fs.writeFileSync(
+                        DefineCommand.getUserFilePath(msg.author), 
+                        toWrite
+                    );
+                } catch(err) {
+                    console.log('There was an error trying to write to the file.', err);
+                    return;
+                }
+                this.push(
+                    responses.reply(msg, `Your macro ${toDelete} was successfully deleted.`)
+                )
+            }
+        } else {
+            this.push(
+                responses.reply(msg, 'You have no existing shortcuts')
+            )
+        }
     }
 }

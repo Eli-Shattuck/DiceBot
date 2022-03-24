@@ -1,0 +1,9 @@
+The Roll-Shortcut Command!
+The roll-shortcut command is used to create and manage shortcuts that allow you to quickly roll for common actions used by ttrpg characters. There are 4 functions:
+
+\t* `new`: Used to create a new shortcut
+\t* `fetch`: Used to access a saved shortcut
+\t* `show all`: Lists all shortcuts you have created
+\t* `delete`: Used to delete a saved shortcut
+
+Each action in a shortcut will have two parts. The first will be an attack roll or will display the DC for a saving throw. The second will be a damage roll. Look through the following pages to learn how to use `--roll-shortcut`!

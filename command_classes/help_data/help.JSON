@@ -11,6 +11,11 @@
             "helpTextFileName":"roll/help_roll_#.txt"
         },
         {
+            "name":"roll-shortcut",
+            "pages":["", "new", "manage"],
+            "helpTextFileName":"roll-shortcut/help_roll-shortcut_#.txt"
+        },
+        {
             "name":"timer",
             "pages":[""],
             "helpTextFileName":"timer/help_timer_#.txt"

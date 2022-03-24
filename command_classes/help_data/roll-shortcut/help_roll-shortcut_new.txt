@@ -1,0 +1,13 @@
+The Roll-Shortcut Command!
+```
+--roll-shortcut new NAME
+"action 1" val 𝑛d𝑥+𝑏 damageType
+"action 2" val 𝑛d𝑥+𝑏 damageType
+\t .
+\t .
+```
+-The shortcut is created with the name `NAME` and can have up to four actions. 
+-Each action has a name, given in quotes, like `"action 1"`. 
+-The value `val` is one of two things: It can be an attack bonus, such as +5 or -2. If the action instead uses a saving throw, you can give the saving throw as long as you do not use spaces, such as DC17_Wisdom.
+-The term `𝑛d𝑥+𝑏` represents a number of dice rolled plus a bonus as the damage roll for the action. See the help pages for the `--roll` command for details. 
+-The `damageType` term can be any one word damage type, such as radiant, for the damage roll.

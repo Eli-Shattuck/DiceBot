@@ -1,0 +1,11 @@
+The Roll-Shortcut Command!
+There are three functions used to manage your already created shortcuts:
+
+`--roll-shortcut fetch NAME`
+This command will retrieve a saved shortcut named `NAME` that you have previously created, so you can use it.
+
+`--roll-shortcut show all`
+This command will show a list of all your created shortcuts.
+
+`--roll-shortcut delete NAME`
+This command deletes a shortcut named `NAME` you have saved.

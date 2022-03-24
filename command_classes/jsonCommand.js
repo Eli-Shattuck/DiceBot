@@ -1,16 +1,15 @@
-const Command = require('../command.js');
-const responses = require('../../io_classes/responses.js');
-const UIEmojis = require('../../io_classes/uiEmojis.js');
-const reactionHandler = require('../../io_classes/reactionHandler.js');
-const jsonHandler = require('../../io_classes/jsonHandler.js');
-const uiEmojis = require('../io_classes/uiEmojis.js');
+const Command = require('./command.js');
+const responses = require('../io_classes/responses.js');
+const UIEmojis = require('../io_classes/uiEmojis.js');
+const reactionHandler = require('../io_classes/reactionHandler.js');
+const jsonHandler = require('../io_classes/jsonHandler.js');
 
 const YES = UIEmojis.YES;
 const STOP = UIEmojis.STOP;
 
 module.exports = class jsonCommand extends Command{
-    constructor(onNewResponse){
-        super(onNewResponse);
+    constructor(onNewResponse, cmdName){
+        super(onNewResponse, cmdName);
     }
 
     getUserFilePath(user){}
@@ -43,9 +42,9 @@ module.exports = class jsonCommand extends Command{
         }
     }
 
-    pushEltToArray(msg, elt, arrayName, equalTo, replaceText, successText){
+    pushEltToArray(msg, elt, arrayName, equalTo, replaceQuestionText, replaceText, successText){
         let array;
-        let userObject = this.getObject(user);
+        let userObject = this.getObject(msg.author);
         if(userObject){
             if(userObject[arrayName]){
                 array = userObject[arrayName];
@@ -62,7 +61,7 @@ module.exports = class jsonCommand extends Command{
                 this.push(
                     responses.reply(
                         msg,
-                        replaceText || "Your file contains an object that matches this. Would you like to replace it?",
+                        replaceQuestionText || "Your file contains an object that matches this. Would you like to replace it?",
                         undefined,
                         message => {
                             reactionHandler.addCallback(
@@ -72,7 +71,7 @@ module.exports = class jsonCommand extends Command{
                                     if(user != msg.author) return;
                                     array[i] = elt;
                                     userObject[arrayName] = array;
-                                    this.saveObject(msg, userObject, successText);
+                                    this.saveObject(msg, userObject, replaceText);
                                     reactionHandler.removeAllCallbacks(message); 
                                     message.delete();
                                 }
@@ -100,8 +99,12 @@ module.exports = class jsonCommand extends Command{
         this.saveObject(msg, userObject, successText);
     }
 
-    showArray(msg, arrayName, eltFields, beforeText, afterText){
+    showArray(msg, arrayName, eltFields, beforeText, afterText, emptyText){
         let array = this.getArray(msg.author, arrayName);
+        if(array.length <= 0) {
+            this.push(responses.reply(msg, emptyText || "You have no objects."));
+            return;
+        }
         let toWrite = beforeText || "You have the following objects:";
         for(let elt of array){
             toWrite += '\n';
@@ -136,7 +139,7 @@ module.exports = class jsonCommand extends Command{
 
     deleteElt(msg, arrayName, isElt, successText, failText, emptyText){
         let array;
-        let userObject = this.getObject(user);
+        let userObject = this.getObject(msg.author);
         if(userObject){
             if(userObject[arrayName]){
                 array = userObject[arrayName];

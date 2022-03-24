@@ -1,13 +1,23 @@
-const Command = require('./command.js');
-const responses = require('../io_classes/responses.js');
+const JsonCommand = require('../jsonCommand.js');
+const responses = require('../../io_classes/responses.js');
+const UIEmojis = require('../../io_classes/uiEmojis.js');
+const reactionHandler = require('../../io_classes/reactionHandler.js');
+const jsonHandler = require('../../io_classes/jsonHandler.js');
 
-module.exports = class CombatMapCommand extends Command{
+const YES = UIEmojis.YES;
+const STOP = UIEmojis.STOP;
+
+module.exports = class CombatMapCommand extends JSONCommand {
     constructor(onNewResponse){
         super(onNewResponse, '--combat-map');
     }
 
     static getCombatMapCreateRE() {
         return /--combat-map\s+create\s+"([\s\S]+)"\s+(\d+)\s?x\s?(\d+)\s+obs\[((?:[\p{L}\P{L}]:[\p{L}\P{L}],)+(?:[\p{L}\P{L}]:[\p{L}\P{L}])?)\]\s+ign\[((?:[\p{L}\P{L}]:[\p{L}\P{L}],)+(?:[\p{L}\P{L}]:[\p{L}\P{L}])?)\]\s+board\[([\s\S]+)\]/u;
+    }
+
+    getUserFilePath(user){
+        return `./command_classes/map_classes/map_data/user${user.id}.json`;
     }
 
     static toString(asciiBoard, rows, cols) {
@@ -23,7 +33,7 @@ module.exports = class CombatMapCommand extends Command{
 
     handle(msg){
         let args = msg.content.match(CombatMapCommand.getCombatMapCreateRE());
-        console.log(args);
+        //console.log(args);
         let name = args[1];
         let cols = parseInt(args[2]);
         let rows = parseInt(args[3]);
@@ -68,7 +78,13 @@ module.exports = class CombatMapCommand extends Command{
             }
             asciiBoard = tmp;
         } else {
-            console.log(`${rows} * ${cols} !== ${asciiBoard.length}`)
+            //console.log(`${rows} * ${cols} !== ${asciiBoard.length}`);
+            this.error(msg, `rows * cols must equal the size of the ascii board (${rows} * ${cols} !== ${asciiBoard.length}.`);
+            return;
+        }
+        if(asciiBoard.length * asciiBoard[0].length >= 2000) {
+            this.error(msg, `rows * cols must be less than 2000.`);
+            return;
         }
 
         console.log(name, cols, rows, obs, ign, CombatMapCommand.toString(asciiBoard, rows, cols));

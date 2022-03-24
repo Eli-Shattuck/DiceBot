@@ -1,17 +1,17 @@
-const Command = require('../command.js');
 const DefineCommand = require('./defineCommand.js');
 const responses = require('../../io_classes/responses.js');
 const client = require('../../clientSource.js');
 
-module.exports = class MacroCommand extends Command {
+module.exports = class MacroCommand extends DefineCommand {
     constructor(onNewResponse){
         super(onNewResponse);
     }
 
     match(msg){
-        for(let macro of DefineCommand.getMacros(msg.author)){
+        console.log("matching for ", msg.author.id);
+        for(let macro of this.getMacros(msg.author)){
             console.log(macro);
-            if(DefineCommand.validate(msg.content, macro["name"])) {
+            if(MacroCommand.validate(msg.content, macro["Name"])) {
                 return true;
             }
         }
@@ -20,24 +20,24 @@ module.exports = class MacroCommand extends Command {
     
     handle(msg){
         let found;
-        for(let macro of DefineCommand.getMacros(msg.author))
+        for(let macro of this.getMacros(msg.author)){
             if(
-                DefineCommand.validate(msg.content, macro["name"]) &&
+                MacroCommand.validate(msg.content, macro["Name"]) &&
                 msg.content.split(' ').length - 1 == macro["argc"]
             ) {
                 found = macro;
                 break;
             }
-        
+        }
         if(!found){
             console.log("A macro has been matched in match but not found in handle.");
             this.push(responses.reply("There was an unexpected error retrieving your macro."));
             return;
         }
 
-        let f = new Function('args', 'dicebot', found["code"]);
+        let f = new Function('args', 'dicebot', found["Code"]);
 
-        let matchRE = found["name"] + '\\s+(.+)'.repeat(isNaN(found["argc"]) ? 0 : found["argc"]);
+        let matchRE = found["Name"] + '\\s+(.+)'.repeat(isNaN(found["argc"]) ? 0 : found["argc"]);
             
         let args = msg.content.match(matchRE);
         args = args.splice(1, args.length) // only keep args

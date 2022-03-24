@@ -1,9 +1,8 @@
 const fs = require('fs');
 
 module.exports = {
-    getObject: (filePath, user) => {
+    getObject: (filePath) => {
         try{
-            console.log(filePath);
             let obj = JSON.parse(
                 fs.readFileSync(
                     filePath, 
@@ -17,7 +16,7 @@ module.exports = {
             );
             return obj;
         } catch(err) {
-            console.log(`No existing files were found for user "${user.username}", ID: ${user.id}.`);
+            console.log(`The file at path ${filePath} was not found.`);
         }
     },
 

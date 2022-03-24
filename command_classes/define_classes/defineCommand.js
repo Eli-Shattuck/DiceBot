@@ -1,8 +1,8 @@
 const Command = require('../command.js');
 const responses = require('../../io_classes/responses.js');
-const fs = require('fs');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
+const jsonHandler = require('../../io_classes/jsonHandler.js');
 
 const YES = UIEmojis.YES;
 const STOP = UIEmojis.STOP;
@@ -21,21 +21,10 @@ module.exports = class DefineCommand extends Command {
     }
 
     static getMacros(user) {
-        let filePath = DefineCommand.getUserFilePath(user);
-        let userMacros = [];
-        try{
-            userMacros = JSON.parse(
-                fs.readFileSync(filePath, 'utf-8', (err, data) => {
-                    if (err) {
-                        throw err;
-                    }
-                })
-            ).data;
-        } catch(err) {
-            console.log(`No existing files were found for user "${user.username}", ID: ${user.id}.`);
-        }
-
-        return userMacros;
+        let userMacros = jsonHandler.getObject(
+            DefineCommand.getUserFilePath(user)
+        );
+        return userMacros ? userMacros.data : [];
     }
 
     static getDefineRE() {
@@ -114,19 +103,18 @@ module.exports = class DefineCommand extends Command {
                                 message,
                                 (reaction, user) => {
                                     userMacros[i] = newMacro;
-                                    try{
-                                        let toWrite = JSON.stringify({data: userMacros});
-                                        fs.writeFileSync(
-                                            DefineCommand.getUserFilePath(msg.author),  
-                                            toWrite
-                                        );
-                                    } catch(err) {
-                                        console.log('There was an error trying to write to the file.', err);
-                                        return;
+                                    let isErr = jsonHandler.saveObject(
+                                        DefineCommand.getPlayerFilePath(msg.author), 
+                                        {data: userMacros}
+                                    );
+                                    if(isErr){
+                                        this.push(responses.reply(msg, "There was an error writing to your file."));
+                                    } else {
+                                        this.push(responses.reply(msg, "Your macro has been modified."));
                                     }
                                     reactionHandler.removeAllCallbacks(message); 
                                     message.delete();
-                                    this.push(responses.reply(msg, "Your macro has been modified."));
+                                    
                                 }
                             )
                             reactionHandler.addCallback(
@@ -147,20 +135,15 @@ module.exports = class DefineCommand extends Command {
         }
         //console.log("newMacro: ", JSON.stringify(newMacro));
         userMacros.push(newMacro);
-        try{
-            let toWrite = JSON.stringify({data: userMacros});
-            fs.writeFileSync(
-                DefineCommand.getUserFilePath(msg.author), 
-                toWrite
-            );
-        } catch(err) {
-            console.log('There was an error trying to write to the file.', err);
-            return;
-        }
-        //console.log("User macros successfully updated.");
-        this.push(
-            responses.reply(msg, "Your macro has been stored.")
+        let isErr = jsonHandler.saveObject(
+            DefineCommand.getPlayerFilePath(msg.author), 
+            {data: userMacros}
         );
+        if(isErr){
+            this.push(responses.reply(msg, "There was an error writing to your file."));
+        } else {
+            this.push(responses.reply(msg, "Your macro has been stored."));
+        }        
     }
 
     showAll(msg){
@@ -210,19 +193,15 @@ module.exports = class DefineCommand extends Command {
                     responses.reply(msg, `You have no existing macros with the name "${toDelete}".`)
                 )
             } else {
-                try{
-                    let toWrite = JSON.stringify({data: userMacros});
-                    fs.writeFileSync(
-                        DefineCommand.getUserFilePath(msg.author), 
-                        toWrite
-                    );
-                } catch(err) {
-                    console.log('There was an error trying to write to the file.', err);
-                    return;
+                let isErr = jsonHandler.saveObject(
+                    DefineCommand.getPlayerFilePath(msg.author), 
+                    {data: userMacros}
+                );
+                if(isErr){
+                    this.push(responses.reply(msg, "There was an error writing to your file."));
+                } else {
+                    this.push(responses.reply(msg, `Your macro ${toDelete} was successfully deleted.`));
                 }
-                this.push(
-                    responses.reply(msg, `Your macro ${toDelete} was successfully deleted.`)
-                )
             }
         } else {
             this.push(

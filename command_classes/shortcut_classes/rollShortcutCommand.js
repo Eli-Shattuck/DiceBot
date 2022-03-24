@@ -45,7 +45,6 @@ module.exports = class RollShortcutCommand extends Command{
     static getPlayerShortcuts(user){
         let playerShortcuts = jsonHandler.getObject(
             RollShortcutCommand.getPlayerFilePath(user), 
-            user
         );
         return playerShortcuts ? playerShortcuts.data : [];
     }

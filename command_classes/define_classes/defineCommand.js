@@ -53,6 +53,10 @@ module.exports = class DefineCommand extends Command {
     static getDefineAnchorRE() {
         return /--define\s+anchor\s+(\S+)/;
     }
+
+    static getDefineShowAnchorsRE() {
+        return /--define\s+show\s+anchors/;
+    }
     
     static match(msg){
         //console.log(msg.content);
@@ -66,6 +70,8 @@ module.exports = class DefineCommand extends Command {
         let matchInspect = msg.content.match(DefineCommand.getDefineInspectRE());
         let matchDelete = msg.content.match(DefineCommand.getDefineDeleteRE());
         let matchAnchor = msg.content.match(DefineCommand.getDefineAnchorRE());
+        let matchShowAnchors = msg.content.match(DefineCommand.getDefineShowAnchorsRE());
+        
         if(matchDefine){
             this.defineNew(msg, matchDefine);
         } else if(matchShowAll) {
@@ -76,6 +82,8 @@ module.exports = class DefineCommand extends Command {
             this.deleteMacro(msg, matchDelete);
         } else if(matchAnchor) {
             this.addAnchor(msg, matchAnchor);
+        }else if(matchShowAnchors) {
+            this.showAnchors(msg);
         } else { 
             this.error(msg, "Your command did not match the expected format.");
             return;
@@ -236,7 +244,12 @@ module.exports = class DefineCommand extends Command {
     addAnchor(msg, matchAnchor){
         let anchorName = matchAnchor[1];
         let userAnchors = DefineCommand.getAnchors(msg.author);
-        userAnchors.push({"name": anchorName, "id": msg.channel.id});
+        userAnchors.push({
+            "name": anchorName, 
+            "chName": msg.channel.name,
+            "serName": msg.guild.name,
+            "id": msg.channel.id
+        });
 
         let isErr = jsonHandler.saveObject(
             DefineCommand.getUserFilePath(msg.author),
@@ -250,5 +263,15 @@ module.exports = class DefineCommand extends Command {
         } else {
             this.push(responses.reply(msg, "Successfully stored anchor!"));
         }
+    }
+
+    showAnchors(msg){
+        let userAnchors = DefineCommand.getAnchors(msg.author);
+        let toWrite = "You have the following anchors:";
+        for(let a of userAnchors){
+            toWrite += `\n"${a["name"]}" : #${a["chName"]} in ${a["serName"]}`;
+        }
+        toWrite += "";
+        this.push(responses.reply(msg, toWrite));
     }
 }

@@ -1,9 +1,7 @@
-const Discord = require('discord.js');
 require("dotenv").config();
 const Parser = require('./parser.js');
 const reactionHandler = require('./io_classes/reactionHandler.js');
-
-const client = new Discord.Client();
+const client = require('./clientSource.js');
 
 
 client.on('ready', () => {

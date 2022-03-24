@@ -20,11 +20,15 @@ module.exports = class DefineCommand extends Command {
         return `./command_classes/define_classes/define_data/user${user.id}.json`;
     }
 
-    static getMacros(user) {
+    static getMacros(user){
         let userMacros = jsonHandler.getObject(
             DefineCommand.getUserFilePath(user)
         );
-        return userMacros ? userMacros.data : [];
+        return userMacros ? userMacros.macros : [];
+    }
+
+    static getAnchors(user){
+        return [{"name":'snannel', "id":'948664107018645536'}];
     }
 
     static getDefineRE() {
@@ -104,8 +108,8 @@ module.exports = class DefineCommand extends Command {
                                 (reaction, user) => {
                                     userMacros[i] = newMacro;
                                     let isErr = jsonHandler.saveObject(
-                                        DefineCommand.getPlayerFilePath(msg.author), 
-                                        {data: userMacros}
+                                        DefineCommand.getUserFilePath(msg.author), 
+                                        {macros: userMacros}
                                     );
                                     if(isErr){
                                         this.push(responses.reply(msg, "There was an error writing to your file."));
@@ -136,8 +140,8 @@ module.exports = class DefineCommand extends Command {
         //console.log("newMacro: ", JSON.stringify(newMacro));
         userMacros.push(newMacro);
         let isErr = jsonHandler.saveObject(
-            DefineCommand.getPlayerFilePath(msg.author), 
-            {data: userMacros}
+            DefineCommand.getUserFilePath(msg.author), 
+            {macros: userMacros}
         );
         if(isErr){
             this.push(responses.reply(msg, "There was an error writing to your file."));
@@ -194,8 +198,8 @@ module.exports = class DefineCommand extends Command {
                 )
             } else {
                 let isErr = jsonHandler.saveObject(
-                    DefineCommand.getPlayerFilePath(msg.author), 
-                    {data: userMacros}
+                    DefineCommand.getUserFilePath(msg.author), 
+                    {macros: userMacros}
                 );
                 if(isErr){
                     this.push(responses.reply(msg, "There was an error writing to your file."));

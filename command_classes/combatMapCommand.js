@@ -6,6 +6,10 @@ module.exports = class CombatMapCommand extends Command{
         super(onNewResponse, '--combat-map');
     }
     
+    static CombatMapCreateRE() {
+        return /--combat-map\s+create\s+"([\s\S]+)"\s+(\d+)\s?x\s?(\d+)\s+obs\[(?:([\p{L}\P{L}]):([\p{L}\P{L}]),)+(?:([\p{L}\P{L}]):([\p{L}\P{L}]))?\]\s+ign\[(?:([\p{L}\P{L}]):([\p{L}\P{L}]),)+(?:([\p{L}\P{L}]):([\p{L}\P{L}]))?\]\s+board\[([\s\S]+)\]/;
+    }
+
     handle(msg){
         
         return;

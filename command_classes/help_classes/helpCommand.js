@@ -1,8 +1,8 @@
-const Command = require('./command.js');
+const Command = require('../command.js');
 const Discord = require('discord.js');
-const reactionHandler = require('../io_classes/reactionHandler.js');
-const UIEmojis = require('../io_classes/uiEmojis.js');
-const responses = require('../io_classes/responses.js');
+const reactionHandler = require('../../io_classes/reactionHandler.js');
+const UIEmojis = require('../../io_classes/uiEmojis.js');
+const responses = require('../../io_classes/responses.js');
 
 module.exports = class HelpCommand extends Command{
     constructor(onNewResponse) {
@@ -10,7 +10,7 @@ module.exports = class HelpCommand extends Command{
 
         this.fs = require('fs');
 
-        let rawdata = this.fs.readFileSync('./command_classes/help_data/help.JSON');
+        let rawdata = this.fs.readFileSync('./command_classes/help_classes/help_data/help.JSON');
         this.helpData = JSON.parse(rawdata);
         this.chapters = this.helpData.chapters;
 
@@ -118,7 +118,7 @@ module.exports = class HelpCommand extends Command{
         let helpText;
         try {
             //console.log('./command_classes/help_data/'+chapter.helpTextFileName.replace('#', page));
-            helpText = this.fs.readFileSync('./command_classes/help_data/'+chapter.helpTextFileName.replace('#', page), 'utf8')
+            helpText = this.fs.readFileSync('./command_classes/help_classes/help_data/'+chapter.helpTextFileName.replace('#', page), 'utf8')
             //console.log(helpText);
             helpText = this.makeNice(helpText);
             //console.log(helpText);

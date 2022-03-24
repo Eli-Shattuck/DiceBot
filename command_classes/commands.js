@@ -8,7 +8,7 @@ module.exports = [
     require('./timer_classes/timerCommand.js'),
     require('./timer_classes/combatTimerCommand.js'),
     require('./luisCommand.js'),
-    require('./helpCommand.js'),
+    require('./help_classes/helpCommand.js'),
     require('./rubiksCubeCommand.js'),
     require('./snake_classes/snakeCommand.js'),
     require('./replyCommand.js'),

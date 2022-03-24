@@ -4,7 +4,7 @@ module.exports = [
     require('./ilyCommand.js'),
     require('./SudokuCommand.js'),
     require('./rollCommand.js'),
-    require('./bazzCommand.js'),
+    require('./bazz_classes/bazzCommand.js'),
     require('./timer_classes/timerCommand.js'),
     require('./timer_classes/combatTimerCommand.js'),
     require('./luisCommand.js'),

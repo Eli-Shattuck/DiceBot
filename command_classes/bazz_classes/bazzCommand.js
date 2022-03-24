@@ -1,5 +1,5 @@
-const Command = require('./command.js');
-const responses = require('../io_classes/responses.js');
+const Command = require('../command.js');
+const responses = require('../../io_classes/responses.js');
 
 module.exports = class BazzCommand extends Command{
     constructor(onNewResponse) {
@@ -15,8 +15,8 @@ module.exports = class BazzCommand extends Command{
             this.push(
                 responses.message(
                     msg, 
-                    `./command_classes/bazz/baz-${i}.png`, 
-                    {files: [`./command_classes/bazz/baz-${i}.png`]}
+                    `./command_classes/bazz_classes/bazz_pictures/baz-${i}.png`, 
+                    {files: [`./command_classes/bazz_classes/bazz_pictures/baz-${i}.png`]}
                 )
             );
         //msg.channel.send("Bazz", {files: ['./command_classes/bazz/baz1.png']});

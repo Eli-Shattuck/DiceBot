@@ -165,8 +165,8 @@ module.exports = class RollCommand extends Command{
                 this.push(
                     responses.message(
                         msg,
-                        `./command_classes/bazz/baz-${res}.png`, 
-                        { files: [`./command_classes/bazz/baz-${res}.png`] }
+                        `./command_classes/bazz_classes/bazz_pictures/baz-${res}.png`, 
+                        { files: [`./command_classes/bazz_classes/bazz_pictures/baz-${res}.png`] }
                         )
                 )
             }

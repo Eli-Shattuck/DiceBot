@@ -6,7 +6,7 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class HelpCommand extends Command{
     constructor(onNewResponse) {
-        super(onNewResponse);
+        super(onNewResponse, '--help');
 
         this.fs = require('fs');
 
@@ -18,11 +18,6 @@ module.exports = class HelpCommand extends Command{
         //console.log(this.helpData);
         //console.log('---ELI---')
     }
-
-    static match(msg){
-        //console.log(msg.content.toLowerCase());
-        return HelpCommand.validate(msg.content, '--help');
-    };
     
     handle(msg){
         let args = msg.content.split(/\s/);

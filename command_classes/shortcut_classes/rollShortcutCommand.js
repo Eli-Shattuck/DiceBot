@@ -11,7 +11,7 @@ const NUMS = UIEmojis.NUMS;
 
 module.exports = class RollShortcutCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--roll-shortcut');
         this.shortcut;
         this.creator;
         this.embedMessage;
@@ -47,10 +47,6 @@ module.exports = class RollShortcutCommand extends Command{
             RollShortcutCommand.getPlayerFilePath(user), 
         );
         return playerShortcuts ? playerShortcuts.data : [];
-    }
-
-    static match(msg){
-        return RollShortcutCommand.validate(msg.content, '--roll-shortcut');
     }
 
     handle(msg){

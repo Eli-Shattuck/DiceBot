@@ -33,7 +33,7 @@ class CTimer{
 
 module.exports = class CombatTimerCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--combat-timer');
         this.combatTimerMap = globalCombatTimerMap;
     }
 
@@ -52,12 +52,6 @@ module.exports = class CombatTimerCommand extends Command{
 
     static getCTimerReRemovePlayer(){
         return /--combat-timer removeplayer "([^_]+(?:_[^_]+)?)"/;
-    }
-
-
-
-    static match(msg){
-        return CombatTimerCommand.validate(msg.content, '--combat-timer');
     }
 
     handle(msg){

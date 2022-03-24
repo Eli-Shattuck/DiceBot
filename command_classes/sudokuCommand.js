@@ -2,9 +2,8 @@ const Command = require('./command.js');
 const responses = require('../io_classes/responses.js');
 
 module.exports = class SudokuCommand extends Command {
-    
     constructor(onNewResponse) {
-      super(onNewResponse);
+      super(onNewResponse, '--sudoku');
       this.nums = '🟦 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣'.split(' ');
       this.nums[-1] = '⬛';
       //this.nums = `   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 `.split('|');
@@ -13,10 +12,6 @@ module.exports = class SudokuCommand extends Command {
 
     static getSudokuRe(){
       return /--sudoku\s+(((\d\s*){9})[\n\r]+){8}(((\d\s*){9})[\n\r]*){1}/;
-    }
-
-    static match(msg){
-      return SudokuCommand.validate(msg.content, '--sudoku');
     }
 
     handle(msg){

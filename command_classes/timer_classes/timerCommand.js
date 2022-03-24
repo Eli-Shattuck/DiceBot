@@ -12,7 +12,7 @@ const DECREASE = UIEmojis.DECREASE;
 
 module.exports = class TimerCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--timer');
         this.timerMap = new Map();
     }
 
@@ -20,10 +20,6 @@ module.exports = class TimerCommand extends Command{
         return /--timer\s+([0-9]+):([0-9]+)/;
     }
 
-    static match(msg){
-        return TimerCommand.validate(msg.content, '--timer');
-    }
-    
     handle(msg){
         let matchTimer = msg.content.match(TimerCommand.getTimerRe());
         if(!matchTimer) {

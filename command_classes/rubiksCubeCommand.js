@@ -350,14 +350,9 @@ return `....o1o2o3
 
 module.exports = class RubiksCubeCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, "--rubik's");
         this.cubes = {};
     }
-
-    static match(msg){
-        //console.log(msg.content.toLowerCase());
-        return RubiksCubeCommand.validate(msg.content, "--rubik's");
-    };
     
     handle(msg){
         let rc = new Cube();

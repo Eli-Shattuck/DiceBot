@@ -13,7 +13,7 @@ let globalMacros = [];
 
 module.exports = class DefineCommand extends Command {
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--define');
     }
 
     static getUserFilePath(user){
@@ -57,12 +57,10 @@ module.exports = class DefineCommand extends Command {
     static getDefineShowAnchorsRE() {
         return /--define\s+show\s+anchors/;
     }
-    
-    static match(msg){
-        //console.log(msg.content);
-        return DefineCommand.validate(msg.content, '--define');
-        //return msg.content.match(DefineCommand.getMatchRE());
-    };
+
+    static getDefineDeleteAnchorRE() {
+        return /--define\s+deleteanchor\s+(\S+)/;
+    }
     
     handle(msg){
         let matchDefine = msg.content.match(DefineCommand.getDefineRE());
@@ -71,6 +69,7 @@ module.exports = class DefineCommand extends Command {
         let matchDelete = msg.content.match(DefineCommand.getDefineDeleteRE());
         let matchAnchor = msg.content.match(DefineCommand.getDefineAnchorRE());
         let matchShowAnchors = msg.content.match(DefineCommand.getDefineShowAnchorsRE());
+        let matchDeleteAnchor = msg.content.match(DefineCommand.getDefineDeleteAnchorRE());
         
         if(matchDefine){
             this.defineNew(msg, matchDefine);
@@ -82,8 +81,10 @@ module.exports = class DefineCommand extends Command {
             this.deleteMacro(msg, matchDelete);
         } else if(matchAnchor) {
             this.addAnchor(msg, matchAnchor);
-        }else if(matchShowAnchors) {
+        } else if(matchShowAnchors) {
             this.showAnchors(msg);
+        } else if(matchDeleteAnchor) {
+            this.deleteAnchor(msg, matchDeleteAnchor);
         } else { 
             this.error(msg, "Your command did not match the expected format.");
             return;
@@ -113,11 +114,11 @@ module.exports = class DefineCommand extends Command {
         //console.log("UserMacros:", userMacros);
         for(let i in userMacros){
             //console.log("macro", macro, "\nnewMacro", newMacro);
-            if(userMacros[i]["name"] == newMacro["name"]){
+            if(userMacros[i]["name"] == newMacro["name"] && userMacros[i]["argc"] == newMacro["argc"]){
                 this.push(
                     responses.reply(
                         msg, 
-                        `You have an existing macro with the name ${newMacro["name"]}. Would you like to replace it?`,
+                        `You have an existing macro with the name ${newMacro["name"]} and argc ${newMacro["argc"]}. Would you like to replace it?`,
                         undefined,
                         message => {
                             reactionHandler.addCallback(
@@ -236,7 +237,7 @@ module.exports = class DefineCommand extends Command {
             }
         } else {
             this.push(
-                responses.reply(msg, 'You have no existing shortcuts')
+                responses.reply(msg, 'You have no existing macros')
             )
         }
     }
@@ -273,5 +274,41 @@ module.exports = class DefineCommand extends Command {
         }
         toWrite += "";
         this.push(responses.reply(msg, toWrite));
+    }
+
+    deleteAnchor(msg, matchDeleteAnchor){
+        let toDelete = matchDeleteAnchor[1];
+        let userAnchors = DefineCommand.getAnchors(msg.author);
+        let initialLen = userAnchors.length;
+        if(initialLen > 0){
+            for(let i = 0; i < initialLen; i++){
+                if(userAnchors[i]["name"] == toDelete){
+                    userAnchors.splice(i, 1);
+                    break;
+                }
+            }
+            if(userAnchors.length == initialLen){
+                this.push(
+                    responses.reply(msg, `You have no existing anchors with the name "${toDelete}".`)
+                )
+            } else {
+                let isErr = jsonHandler.saveObject(
+                    DefineCommand.getUserFilePath(msg.author), 
+                    {
+                        macros: DefineCommand.getMacros(msg.author),
+                        anchors: userAnchors
+                    }
+                );
+                if(isErr){
+                    this.push(responses.reply(msg, "There was an error writing to your file."));
+                } else {
+                    this.push(responses.reply(msg, `Your anchor ${toDelete} was successfully deleted.`));
+                }
+            }
+        } else {
+            this.push(
+                responses.reply(msg, 'You have no existing anchors')
+            )
+        }
     }
 }

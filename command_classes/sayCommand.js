@@ -3,7 +3,7 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class SayCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--say');
     }
 
     static match(msg){

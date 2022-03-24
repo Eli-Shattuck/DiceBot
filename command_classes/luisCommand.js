@@ -3,13 +3,8 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class LuisCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--luis');
     }
-
-    static match(msg){
-        //console.log(msg.content.toLowerCase());
-        return LuisCommand.validate(msg.content, '--luis');
-    };
     
     handle(msg){
         let user = msg.guild.members.cache.random();

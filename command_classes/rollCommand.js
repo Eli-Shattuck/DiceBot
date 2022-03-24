@@ -104,15 +104,11 @@ class Flag {
 
 module.exports = class RollCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--roll');
     }
 
     static getRollRe(){
         return /^--roll\s*(\d*)\s*[dD]\s*(\d+)\s*([+-]\s*\d+){0,1}\s*(-[^-].+){0,1}(.*)/;
-    }
-
-    static match(msg){
-        return RollCommand.validate(msg.content, '--roll');
     }
 
     handle(msg){
@@ -162,6 +158,11 @@ module.exports = class RollCommand extends Command{
     sendResults(msg, results, extraLines, bazz){
         if(bazz) {
             for(let res of results) {
+                if(isNaN(res)){
+                    this.push(responses.reply(msg, "The result was not a number"));
+                    console.log("The result was not a number: ", res);
+                    continue;
+                }
                 this.push(
                     responses.message(
                         msg,

@@ -19,7 +19,10 @@ module.exports = class MacroCommand extends Command {
     handle(msg){
         let found;
         for(let macro of DefineCommand.getMacros(msg.author))
-            if(DefineCommand.validate(msg.content, macro["name"])) {
+            if(
+                DefineCommand.validate(msg.content, macro["name"]) &&
+                msg.content.split(' ').length - 1 == macro["argc"]
+            ) {
                 found = macro;
                 break;
             }

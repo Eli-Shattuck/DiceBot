@@ -3,12 +3,8 @@ const responses = require('../../io_classes/responses.js');
 
 module.exports = class BazzCommand extends Command{
     constructor(onNewResponse) {
-        super(onNewResponse);
+        super(onNewResponse, '--bazz');
     }
-
-    static match(msg) {
-        return BazzCommand.validate(msg.content, '--bazz');
-    };
     
     handle(msg) {
         for(let i = 1; i <= 20; i++) {

@@ -1,9 +1,9 @@
 const Command = require('../command.js');
 const Discord = require('discord.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
+const jsonHandler = require('../../io_classes/jsonHandler.js');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
 const responses = require('../../io_classes/responses.js');
-const fs = require('fs');
 
 const YES = UIEmojis.YES;
 const STOP = UIEmojis.STOP;
@@ -43,20 +43,11 @@ module.exports = class RollShortcutCommand extends Command{
     }
 
     static getPlayerShortcuts(user){
-        let filePath = RollShortcutCommand.getPlayerFilePath(user);
-        let playerShortcuts = [];
-        try{
-            playerShortcuts = JSON.parse(
-                fs.readFileSync(filePath, 'utf-8', (err, data) => {
-                    if (err) {
-                        throw err;
-                    }
-                })
-            ).data;
-        } catch(err) {
-            console.log(`No existing files were found for user "${user.username}", ID: ${user.id}.`);
-        }
-        return playerShortcuts;
+        let playerShortcuts = jsonHandler.getObject(
+            RollShortcutCommand.getPlayerFilePath(user), 
+            user
+        );
+        return playerShortcuts ? playerShortcuts.data : [];
     }
 
     static match(msg){
@@ -111,19 +102,15 @@ module.exports = class RollShortcutCommand extends Command{
                     responses.reply(msg, `You have no existing shortcuts with the name "${toDelete}".`)
                 )
             } else {
-                try{
-                    let toWrite = JSON.stringify({data: playerShortcuts});
-                    fs.writeFileSync(
-                        RollShortcutCommand.getPlayerFilePath(msg.author), 
-                        toWrite
-                    );
-                } catch(err) {
-                    console.log('There was an error trying to write to the file.', err);
-                    return;
+                let isErr = jsonHandler.saveObject(
+                    RollShortcutCommand.getPlayerFilePath(msg.author), 
+                    {data: playerShortcuts}
+                );
+                if(isErr){
+                    this.push(responses.reply(msg, "There was an error writing to your file."));
+                } else {
+                    this.push(responses.reply(msg, `The shortcut ${toDelete} was successfully deleted.`));
                 }
-                this.push(
-                    responses.reply(msg, `The shortcut ${toDelete} was successfully deleted.`)
-                )
             }
         } else {
             this.push(
@@ -157,16 +144,10 @@ module.exports = class RollShortcutCommand extends Command{
                             message,
                             (reaction, user) => {
                                 playerShortcuts[oldShortcutIndex] = this.shortcut;
-                                try{
-                                    let toWrite = JSON.stringify({data: playerShortcuts});
-                                    fs.writeFileSync(
-                                        RollShortcutCommand.getPlayerFilePath(msg.author), 
-                                        toWrite
-                                    );
-                                } catch(err) {
-                                    console.log('There was an error trying to write to the file.', err);
-                                    return;
-                                }
+                                jsonHandler.saveObject(
+                                    RollShortcutCommand.getPlayerFilePath(msg.author),
+                                    {data: playerShortcuts}
+                                )
                                 reactionHandler.removeAllCallbacks(message); 
                                 message.delete();
                                 this.push(responses.reply(msg, "Successfully stored shortcut!"));
@@ -189,18 +170,16 @@ module.exports = class RollShortcutCommand extends Command{
             );
         } else {
             playerShortcuts.push(this.shortcut);
-            try{
-                let toWrite = JSON.stringify({data: playerShortcuts});
-                fs.writeFileSync(
-                    RollShortcutCommand.getPlayerFilePath(msg.author), 
-                    toWrite
-                );
-            } catch(err) {
-                console.log('There was an error trying to write to the file.', err);
-                return;
+            let isErr = jsonHandler.saveObject(
+                RollShortcutCommand.getPlayerFilePath(msg.author), 
+                {data: playerShortcuts}
+            );
+            if(isErr){
+                this.push(responses.reply(msg, "There was an error writing to your file."));
+            } else {
+                this.push(responses.reply(msg, "Successfully stored shortcut!"));
+                this.openShortcut(msg);
             }
-            this.push(responses.reply(msg, "Successfully stored shortcut!"));
-            this.openShortcut(msg);
         }
     }
 

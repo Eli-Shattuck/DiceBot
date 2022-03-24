@@ -10,7 +10,7 @@ module.exports = [
     require('./luisCommand.js'),
     require('./helpCommand.js'),
     require('./rubiksCubeCommand.js'),
-    require('./snakeCommand.js'),
+    require('./snake_classes/snakeCommand.js'),
     require('./replyCommand.js'),
     require('./sayCommand.js'),
     require('./define_classes/defineCommand.js'),

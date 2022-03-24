@@ -1,4 +1,4 @@
-const Parser = require('../parser.js');
+const Parser = require('../../parser.js');
 const Discord = require('discord.js');
 const converter = require('number-to-words');
 

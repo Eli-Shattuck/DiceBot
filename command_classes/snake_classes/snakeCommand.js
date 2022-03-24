@@ -1,4 +1,4 @@
-const Command = require('./command.js');
+const Command = require('../command.js');
 const Discord = require('discord.js');
 
 module.exports = class SnakeCommand extends Command{

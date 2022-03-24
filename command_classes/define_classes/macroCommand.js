@@ -59,7 +59,7 @@ module.exports = class MacroCommand extends Command {
                         message.channel = saveChannel;    
                     });
             } else {
-                this.push(responses.reply("The given anchor does not exist."));
+                this.push(responses.reply(message, "The given anchor does not exist."));
             }
         } else {
             this.parse(str, message);

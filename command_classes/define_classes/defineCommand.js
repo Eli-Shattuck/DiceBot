@@ -21,14 +21,17 @@ module.exports = class DefineCommand extends Command {
     }
 
     static getMacros(user){
-        let userMacros = jsonHandler.getObject(
+        let userObject = jsonHandler.getObject(
             DefineCommand.getUserFilePath(user)
         );
-        return userMacros ? userMacros.macros : [];
+        return userObject ? userObject.macros : [];
     }
 
     static getAnchors(user){
-        return [{"name":'snannel', "id":'948664107018645536'}];
+        let userObject = jsonHandler.getObject(
+            DefineCommand.getUserFilePath(user)
+        );
+        return userObject ? userObject.anchors : [];
     }
 
     static getDefineRE() {
@@ -46,6 +49,10 @@ module.exports = class DefineCommand extends Command {
     static getDefineDeleteRE() {
         return /--define\s+delete\s+(--\S+)/;
     }
+
+    static getDefineAnchorRE() {
+        return /--define\s+anchor\s+(\S+)/;
+    }
     
     static match(msg){
         //console.log(msg.content);
@@ -58,6 +65,7 @@ module.exports = class DefineCommand extends Command {
         let matchShowAll = msg.content.match(DefineCommand.getDefineShowAllRE());
         let matchInspect = msg.content.match(DefineCommand.getDefineInspectRE());
         let matchDelete = msg.content.match(DefineCommand.getDefineDeleteRE());
+        let matchAnchor = msg.content.match(DefineCommand.getDefineAnchorRE());
         if(matchDefine){
             this.defineNew(msg, matchDefine);
         } else if(matchShowAll) {
@@ -66,6 +74,8 @@ module.exports = class DefineCommand extends Command {
             this.inspectMacro(msg, matchInspect);
         } else if(matchDelete) {
             this.deleteMacro(msg, matchDelete);
+        } else if(matchAnchor) {
+            this.addAnchor(msg, matchAnchor);
         } else { 
             this.error(msg, "Your command did not match the expected format.");
             return;
@@ -109,7 +119,10 @@ module.exports = class DefineCommand extends Command {
                                     userMacros[i] = newMacro;
                                     let isErr = jsonHandler.saveObject(
                                         DefineCommand.getUserFilePath(msg.author), 
-                                        {macros: userMacros}
+                                        {
+                                            macros: userMacros,
+                                            anchors: DefineCommand.getAnchors(msg.author)
+                                        }
                                     );
                                     if(isErr){
                                         this.push(responses.reply(msg, "There was an error writing to your file."));
@@ -141,7 +154,10 @@ module.exports = class DefineCommand extends Command {
         userMacros.push(newMacro);
         let isErr = jsonHandler.saveObject(
             DefineCommand.getUserFilePath(msg.author), 
-            {macros: userMacros}
+            {
+                macros: userMacros,
+                anchors: DefineCommand.getAnchors(msg.author)
+            }
         );
         if(isErr){
             this.push(responses.reply(msg, "There was an error writing to your file."));
@@ -199,7 +215,10 @@ module.exports = class DefineCommand extends Command {
             } else {
                 let isErr = jsonHandler.saveObject(
                     DefineCommand.getUserFilePath(msg.author), 
-                    {macros: userMacros}
+                    {
+                        macros: userMacros,
+                        anchors: DefineCommand.getAnchors(msg.author)
+                    }
                 );
                 if(isErr){
                     this.push(responses.reply(msg, "There was an error writing to your file."));
@@ -211,6 +230,25 @@ module.exports = class DefineCommand extends Command {
             this.push(
                 responses.reply(msg, 'You have no existing shortcuts')
             )
+        }
+    }
+
+    addAnchor(msg, matchAnchor){
+        let anchorName = matchAnchor[1];
+        let userAnchors = DefineCommand.getAnchors(msg.author);
+        userAnchors.push({"name": anchorName, "id": msg.channel.id});
+
+        let isErr = jsonHandler.saveObject(
+            DefineCommand.getUserFilePath(msg.author),
+            {
+                macros : DefineCommand.getMacros(msg.author),
+                anchors : userAnchors
+            }
+        )
+        if(isErr){
+            this.push(responses.reply(msg, "There was an error storing your anchor."));
+        } else {
+            this.push(responses.reply(msg, "Successfully stored anchor!"));
         }
     }
 }

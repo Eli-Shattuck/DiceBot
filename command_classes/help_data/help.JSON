@@ -44,6 +44,11 @@
             "name":"luis",
             "pages":[""],
             "helpTextFileName":"luis/help_luis_#.txt"
+        },
+        {
+            "name":"sn",
+            "pages":[""],
+            "helpTextFileName":"sn/help_sn_#.txt"
         }
     ]
 }

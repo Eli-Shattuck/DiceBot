@@ -1,0 +1,7 @@
+The SN Command!
+The command `--sn` has been made to help introduce the idea of snake people to users of \DiceBot!
+Simply call `--sn` before any other command to modify the output of that command to better suit our serpentine bretheren. Try some of my favorites:
+
+\t* `--sn --say`  Modify any sentence for \DiceBot to say!
+\t* `--sn --help`  Help our scaly friends use \DiceBot!
+\t* `--sn --timer`  Keep the time for your favorite snakes!

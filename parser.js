@@ -8,11 +8,9 @@ module.exports = class Parser{
     parse() {
         for(let Cmd of commandHandlers){
             //console.log(Cmd);
-            
-            if(Cmd.match(this.msg)){
-                let cmd = new Cmd(this.respond.bind(this));
+            let cmd = new Cmd(this.respond.bind(this));
+            if(cmd.match(this.msg)){
                 cmd.handle(this.msg);
-
                 return;
             }
         } 

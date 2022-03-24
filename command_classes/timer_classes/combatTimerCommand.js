@@ -33,17 +33,9 @@ class CTimer{
 
 module.exports = class CombatTimerCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--combat-timer');
         this.combatTimerMap = globalCombatTimerMap;
     }
-                    
-    static getCmdName(){
-        return '--combat-timer';
-    }
-  
-    static match(msg){
-        return CombatTimerCommand.validate(msg.content, CombatTimerCommand.getCmdName());
-    };
 
     //static functions are used to store the regular expressions for inputs
     static getCTimerReTitle(){

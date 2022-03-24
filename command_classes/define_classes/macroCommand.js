@@ -8,11 +8,13 @@ module.exports = class MacroCommand extends Command {
         super(onNewResponse);
     }
 
-    static match(msg){
-        for(let macro of DefineCommand.getMacros(msg.author))
+    match(msg){
+        for(let macro of DefineCommand.getMacros(msg.author)){
+            console.log(macro);
             if(DefineCommand.validate(msg.content, macro["name"])) {
                 return true;
             }
+        }
         return false;
     };
     

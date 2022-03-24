@@ -13,16 +13,8 @@ let globalMacros = [];
 
 module.exports = class DefineCommand extends Command {
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--define');
     }
-
-    static getCmdName(){
-        return '--define';
-    }
-
-    static match(msg){
-        return DefineCommand.validate(msg.content, DefineCommand.getCmdName());
-    };
 
     static getUserFilePath(user){
         return `./command_classes/define_classes/define_data/user${user.id}.json`;
@@ -208,7 +200,7 @@ module.exports = class DefineCommand extends Command {
             return;
         }
 
-        let num = isNaN(parseInt(found["argc"])) ? 0 : found["argc"];
+        let num = argc;
         let toWrite = `Your macro ${found["name"]} takes ${num} arguments, and runs the following code:\n`;
         toWrite += `\`\`\`${found["code"]}\`\`\``;
         this.push(responses.reply(msg, toWrite));

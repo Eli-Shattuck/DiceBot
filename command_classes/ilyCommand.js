@@ -3,15 +3,11 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class ILYCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
-    }
-                
-    static getCmdName(){
-        return '--i love you';
+        super(onNewResponse, '--i love you');
     }
 
-    static match(msg){
-        return ILYCommand.validate(msg.content.toLowerCase(), '--i love you');
+    match(msg){
+        return ILYCommand.validate(msg.content.toLowerCase(), this.cmdName);
     }
     
     handle(msg){

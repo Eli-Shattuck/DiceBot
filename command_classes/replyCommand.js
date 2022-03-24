@@ -3,19 +3,15 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class ReplyCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse);
+        super(onNewResponse, '--reply');
     }
 
-    static getCmdName(){
-        return '--reply';
-    }
-
-    static match(msg){ 
-        return msg.content.toLowerCase().indexOf('--reply ') === 0;
+    match(msg){ 
+        return msg.content.toLowerCase().indexOf(this.cmdName + ' ') === 0;
     };
     
     handle(msg){
-        this.push(responses.reply(msg, msg.content.substring('--reply '.length)));
+        this.push(responses.reply(msg, msg.content.substring(this.cmdName.length+1)));
         return;
     };
 }

@@ -16,7 +16,7 @@ module.exports = {
             );
             return obj;
         } catch(err) {
-            console.log(`The file at path ${filePath} was not found.`);
+            //console.log(`The file at path ${filePath} was not found.`);
         }
     },
 

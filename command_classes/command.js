@@ -3,15 +3,16 @@ const responses = require('../io_classes/responses.js');
 module.exports = class Command{
     constructor(onNewResponse, cmdName){
         this.onNewResponse = onNewResponse;
+        this.cmdName = cmdName;
     }
-
-    static getCmdName(){}
 
     static validate(content, name){
         return content.match(`^${name}(?:[\\s]+[\\S\\s]*|$)`);
     }
 
-    static match(msg){}
+    match(msg){
+        return Command.validate(msg.content, this.cmdName);
+    }
 
     handle(msg){}
 

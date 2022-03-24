@@ -3,8 +3,16 @@ const Discord = require('discord.js');
 
 module.exports = class SnakeCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse, '--sn');
+        super(onNewResponse);
     }
+        
+    static getCmdName(){
+        return '--sn';
+    }
+  
+    static match(msg){
+        return SnakeCommand.validate(msg.content, SnakeCommand.getCmdName());
+    };
 
     handle(msg){
         //console.log('-----NEW MESSAGE-----');

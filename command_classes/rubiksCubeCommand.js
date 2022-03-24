@@ -350,10 +350,18 @@ return `....o1o2o3
 
 module.exports = class RubiksCubeCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse, "--rubik's");
+        super(onNewResponse);
         this.cubes = {};
     }
-    
+                    
+    static getCmdName(){
+        return "--rubik's";
+    }
+  
+    static match(msg){
+        return RubiksCubeCommand.validate(msg.content, RubiksCubeCommand.getCmdName());
+    };
+
     handle(msg){
         let rc = new Cube();
         //console.log(Cube.getNet());

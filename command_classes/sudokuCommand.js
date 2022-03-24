@@ -3,12 +3,20 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class SudokuCommand extends Command {
     constructor(onNewResponse) {
-      super(onNewResponse, '--sudoku');
+      super(onNewResponse);
       this.nums = '🟦 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣'.split(' ');
       this.nums[-1] = '⬛';
       //this.nums = `   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 `.split('|');
       //this.nums[-1] = '###';
     }
+
+    static getCmdName(){
+        return '--sudoku';
+    }
+
+    static match(msg){
+        return SudokuCommand.validate(msg.content, SudokuCommand.getCmdName());
+    };
 
     static getSudokuRe(){
       return /--sudoku\s+(((\d\s*){9})[\n\r]+){8}(((\d\s*){9})[\n\r]*){1}/;

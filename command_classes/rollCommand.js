@@ -104,8 +104,16 @@ class Flag {
 
 module.exports = class RollCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse, '--roll');
+        super(onNewResponse);
     }
+                
+    static getCmdName(){
+        return '--roll';
+    }
+  
+    static match(msg){
+        return RollCommand.validate(msg.content, RollCommand.getCmdName());
+    };
 
     static getRollRe(){
         return /^--roll\s*(\d*)\s*[dD]\s*(\d+)\s*([+-]\s*\d+){0,1}\s*(-[^-].+){0,1}(.*)/;

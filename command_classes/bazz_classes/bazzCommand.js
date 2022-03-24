@@ -3,9 +3,17 @@ const responses = require('../../io_classes/responses.js');
 
 module.exports = class BazzCommand extends Command{
     constructor(onNewResponse) {
-        super(onNewResponse, '--bazz');
+        super(onNewResponse);
     }
     
+    static getCmdName(){
+        return '--bazz';
+    }
+  
+    static match(msg){
+        return BazzCommand.validate(msg.content, BazzCommand.getCmdName());
+    };
+  
     handle(msg) {
         for(let i = 1; i <= 20; i++) {
             this.push(

@@ -13,8 +13,16 @@ let globalMacros = [];
 
 module.exports = class DefineCommand extends Command {
     constructor(onNewResponse){
-        super(onNewResponse, '--define');
+        super(onNewResponse);
     }
+
+    static getCmdName(){
+        return '--define';
+    }
+
+    static match(msg){
+        return DefineCommand.validate(msg.content, DefineCommand.getCmdName());
+    };
 
     static getUserFilePath(user){
         return `./command_classes/define_classes/define_data/user${user.id}.json`;
@@ -94,7 +102,7 @@ module.exports = class DefineCommand extends Command {
     defineNew(msg, matchDefine){
         let macroName = matchDefine[1];
         
-        let argc = matchDefine[2];
+        let argc = matchDefine[2] ? matchDefine[2] : 0;
         argc = parseInt(argc);
         
         let code = matchDefine[3];

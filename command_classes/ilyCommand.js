@@ -3,7 +3,11 @@ const responses = require('../io_classes/responses.js');
 
 module.exports = class ILYCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse, '--i love you');
+        super(onNewResponse);
+    }
+                
+    static getCmdName(){
+        return '--i love you';
     }
 
     static match(msg){

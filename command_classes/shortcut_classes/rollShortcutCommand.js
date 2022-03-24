@@ -11,12 +11,20 @@ const NUMS = UIEmojis.NUMS;
 
 module.exports = class RollShortcutCommand extends Command{
     constructor(onNewResponse){
-        super(onNewResponse, '--roll-shortcut');
+        super(onNewResponse);
         this.shortcut;
         this.creator;
         this.embedMessage;
         this.sentResponse;
     }
+        
+    static getCmdName(){
+        return '--roll-shortcut';
+    }
+  
+    static match(msg){
+        return RollShortcutCommand.validate(msg.content, RollShortcutCommand.getCmdName());
+    };
 
     static getRollShortReTitle(){
         return /--roll-shortcut\s+new\s+(.+)/;

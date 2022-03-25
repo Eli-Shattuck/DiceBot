@@ -51,7 +51,7 @@ module.exports = class RollShortcutCommand extends JSONCommand{
     }
 
     getUserFilePath(user){
-        return `./command_classes/shortcut_classes/shortcut_data/user${user.id}.json`;
+        return `./command_classes/roll-shortcut_classes/shortcut_data/user${user.id}.json`;
     }
 
     getPlayerShortcuts(user){

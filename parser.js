@@ -1,4 +1,5 @@
 const commandHandlers = require('./command_classes/commands.js')
+const Paginator = require('./io_classes/paginator.js')
 
 module.exports = class Parser{
     constructor(msg){
@@ -7,7 +8,6 @@ module.exports = class Parser{
 
     parse() {
         for(let Cmd of commandHandlers){
-            //console.log(Cmd);
             let cmd = new Cmd(this.respond.bind(this));
             if(cmd.match(this.msg)){
                 cmd.handle(this.msg);
@@ -19,39 +19,7 @@ module.exports = class Parser{
     }
     
     respond(response) {
-        if(response.isMessage){
-            this.sendMessage(response)
-        } else if(response.isReply){
-            this.replyMessage(response)
-        } else if(response.isEdit){
-            this.editMessage(response)
-        } else {
-            this.msg.reply("There was an error responding to your command.")
-        }
-    }
-
-    sendMessage(response){
-        if(response.thenLambda){
-            response.msg.channel.send(response.content, response.attachment).then(response.thenLambda)
-        } else {
-            response.msg.channel.send(response.content, response.attachment)
-        }
-    }
-
-    replyMessage(response){
-        if(response.thenLambda){
-            response.msg.reply(response.content, response.attachment).then(response.thenLambda)
-        } else {
-            response.msg.reply(response.content, response.attachment)
-        }
-    }
-
-    editMessage(response){
-        if(response.thenLambda){
-            response.msg.edit(response.content, response.attachment).then(response.thenLambda)
-        } else {
-            response.msg.edit(response.content, response.attachment)
-        }
+        Paginator.paginate(response);
     }
 }
 

@@ -3,12 +3,14 @@ const Discord = require('discord.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
 const responses = require('../../io_classes/responses.js');
+const { message } = require('prompt');
 
 const NUMS = UIEmojis.NUMS;
 
 module.exports = class ShortcutCommand extends JSONCommand{
     constructor(onNewResponse){
-        super(onNewResponse, '--shortcut')
+        super(onNewResponse, '--shortcut');
+        this.sentMessage;
     }
 
     static getShortcutReTitle(){
@@ -150,10 +152,10 @@ module.exports = class ShortcutCommand extends JSONCommand{
             )
         }
 
-        this.sendEmbed(msg, messageEmbed, shortcut);
+        this.sendShortcutEmbed(msg, messageEmbed, shortcut);
     }
 
-    sendEmbed(msg, messageEmbed, shortcut){
+    sendShortcutEmbed(msg, messageEmbed, shortcut){
         let cmds = shortcut["Commands"];
 
         this.push(
@@ -182,6 +184,27 @@ module.exports = class ShortcutCommand extends JSONCommand{
         msg.content = cmdText;
         let Parser = require('../../parser.js');
         let p = new Parser(msg);
+
+        let paginator = require('../../io_classes/paginator.js');
+        p.respond = response => {
+            if(this.sentMessage) {
+                response.isMessage = false;
+                if(response.isReply && !(response.content instanceof Discord.MessageEmbed)){
+                    response.content = `${response.msg.author}, ` + response.content; 
+                }
+                response.isReply = false;
+                response.isEdit = true;
+                response.msg = this.sentMessage;
+            }
+            let lambda = response.thenLambda;
+            response.thenLambda = message => {
+                if(!this.sentMessage) this.sentMessage = message;
+                if(response.isEdit && response.attachment) response.msg.channel.send(response.attachment);
+                if(lambda) lambda(message);
+            }
+            paginator.paginate(response);
+        }
+
         p.parse(); 
         msg.content = oldContent;       
     }

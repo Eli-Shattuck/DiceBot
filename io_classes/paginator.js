@@ -156,7 +156,12 @@ function handleString(response) {
         response.content = pages.getCurrPage();
         replyMessage(response, pages);
     } else if(response.isEdit) {
-        editMessage(response);
+        let pages = openMessages.get(response.msg.id);
+        if(pages){
+            pages.edit(response);
+            response.content = pages.getCurrPage();
+        }
+        editMessage(response, pages);
     } else {
         response.msg.reply("There was an error responding to your command.")
     }

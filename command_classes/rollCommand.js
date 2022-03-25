@@ -177,7 +177,15 @@ module.exports = class RollCommand extends Command{
                 toSend += res + "\n";
             }
             this.push(
-                responses.message(msg, toSend)
+                responses.message(
+                    msg, 
+                    toSend, 
+                    undefined, 
+                    undefined,
+                    str => {
+                        return str.split('\n').length > 20;
+                    }
+                )
             );
         }
         if(extraLines) {

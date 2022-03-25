@@ -6,14 +6,16 @@ module.exports = class RollShortcutParser extends Parser{
     constructor(msg, shortcutCommand){
         super(msg);
         this.shortcutCommand = shortcutCommand;
-        this.shortcutName = shortcutCommand.shortcut.name;
+        this.shortcutName = shortcutCommand.shortcut["Name"];
         this.cmdType;
         this.dmgType;
+        this.atkBonus;
     }
 
     parse(action){
         this.cmdType = action.cmdType;
         this.dmgType = action.dmgType;
+        this.atkBonus = action.atkBonus;
         super.parse();
     }
 
@@ -23,10 +25,18 @@ module.exports = class RollShortcutParser extends Parser{
         if(this.cmdType == 'attack'){
             let attackRoll = parseInt(response.content);
             if(isNaN(attackRoll)) return;
+            let crit;
+            if(attackRoll - this.atkBonus == 1){
+                crit = 'You rolled a natural 1! ';
+            } else if(attackRoll - this.atkBonus == 20){
+                crit = 'You rolled a NATURAL 20!!! ';
+            } else {
+                crit = '';
+            }
             this.shortcutCommand.push(
                 send(
                     msg, 
-                    `${this.shortcutCommand.creator}, ${this.shortcutName} rolled a ${attackRoll} for their attack!`, 
+                    `${this.shortcutCommand.creator}, ${crit}${this.shortcutName} rolled a ${attackRoll} for their attack!`, 
                     undefined,
                     message => {
                         if(!this.shortcutCommand.sentResponse) this.shortcutCommand.sentResponse = message;

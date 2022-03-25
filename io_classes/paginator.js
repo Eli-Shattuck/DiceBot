@@ -55,7 +55,7 @@ class Pages {
 }
 
 function messageSetUp(message, pages){
-    if(pages.getLength() <= 1) return;
+    if(!pages || pages.getLength() <= 1) return;
 
     openMessages.set(message.id, pages);
 

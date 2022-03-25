@@ -7,7 +7,7 @@ const jsonHandler = require('../io_classes/jsonHandler.js');
 const YES = UIEmojis.YES;
 const STOP = UIEmojis.STOP;
 
-module.exports = class jsonCommand extends Command{
+module.exports = class JSONCommand extends Command {
     constructor(onNewResponse, cmdName){
         super(onNewResponse, cmdName);
     }
@@ -131,8 +131,8 @@ module.exports = class jsonCommand extends Command{
             return;
         }
         let toWrite = foundText || "Your object has the following attributes:";
-        for(let field in elt){
-            toWrite += `\n${field} : "${elt[field]}"`;
+        for(let field in found){
+            toWrite += `\n${field} : "${found[field]}"`;
         }
         this.push(responses.reply(msg, toWrite));
     }

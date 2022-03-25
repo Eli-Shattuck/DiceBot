@@ -16,5 +16,5 @@ module.exports = [
     require('./define_classes/defineCommand.js'),
     require('./define_classes/macroCommand.js'),
     require('./shortcut_classes/rollShortcutCommand.js'),
-    require('./combatMapCommand.js')
+    require('./map_classes/combatMapCommand.js')
 ]

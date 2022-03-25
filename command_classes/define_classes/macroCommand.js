@@ -8,9 +8,7 @@ module.exports = class MacroCommand extends DefineCommand {
     }
 
     match(msg){
-        console.log("matching for ", msg.author.id);
         for(let macro of this.getMacros(msg.author)){
-            console.log(macro);
             if(MacroCommand.validate(msg.content, macro["Name"])) {
                 return true;
             }
@@ -53,18 +51,18 @@ module.exports = class MacroCommand extends DefineCommand {
     parseAnchor(str, message, anchorName) {
         if(anchorName){
             let saveChannel;
-            let anchors = DefineCommand.getAnchors(message.author);
-            let anchor = anchors.find(elt => elt["name"] == anchorName);
+            let anchors = this.getAnchors(message.author);
+            let anchor = anchors.find(elt => elt["Name"] == anchorName);
             if(anchor){
                 saveChannel = message.channel;
-                client.channels.fetch(anchor["id"])
+                client.channels.fetch(anchor["ID"])
                     .then(ch => {
                         message.channel = ch;
                         this.parse(str, message);
                         message.channel = saveChannel;    
                     });
             } else {
-                this.push(responses.reply(message, "The given anchor does not exist."));
+                this.push(responses.reply(message, "You do not have a saved anchor with the given name."));
             }
         } else {
             this.parse(str, message);

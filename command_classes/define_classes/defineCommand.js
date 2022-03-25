@@ -1,14 +1,7 @@
-const JsonCommand = require('../jsonCommand.js');
-const responses = require('../../io_classes/responses.js');
+const JSONCommand = require('../jsonCommand.js');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
-const reactionHandler = require('../../io_classes/reactionHandler.js');
-const jsonHandler = require('../../io_classes/jsonHandler.js');
 
-const YES = UIEmojis.YES;
-const STOP = UIEmojis.STOP;
-
-
-module.exports = class DefineCommand extends JsonCommand {
+module.exports = class DefineCommand extends JSONCommand {
     constructor(onNewResponse){
         super(onNewResponse, '--define');
     }
@@ -22,7 +15,7 @@ module.exports = class DefineCommand extends JsonCommand {
     }
 
     static getDefineInspectRE() {
-        return /--define\s+inspect\s+(--\S+)/;
+        return /--define\s+inspect\s+(--\S+)\s*/;
     }
 
     static getDefineDeleteRE() {
@@ -78,6 +71,10 @@ module.exports = class DefineCommand extends JsonCommand {
         return this.getArray(user, "Macros");
     }
 
+    getAnchors(user){
+        return this.getArray(user, "Anchors");
+    }
+
     defineNew(msg, matchDefine){
         let macroName = matchDefine[1];
         let argc = matchDefine[2] ? matchDefine[2] : 0;
@@ -125,9 +122,9 @@ module.exports = class DefineCommand extends JsonCommand {
             msg,
             "Macros",
             elt => {
-                if(elt["Name"] = macroName){
+                if(elt["Name"] == macroName){
                     elt["Code"] = '```\n' + elt["Code"] + '\n```';
-                    return;
+                    return true;
                 } 
             },
             "This macro has the following properties:",

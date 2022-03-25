@@ -19,10 +19,34 @@ module.exports = class ShortcutCommand extends JSONCommand{
         return /"(.+)"\s+(--.+)/;
     }
 
+    static getShortcutReFetch(){
+        return /--shortcut\s+fetch\s+(.+)/;
+    }
+
+    static getShortcutReShow(){
+        return /--shortcut\s+show\s+all/;
+    }
+
+    static getShortcutReDelete(){
+        return /--shortcut\s+delete\s+(.+)/;
+    }
+
     handle(msg){
         let matchSave = msg.content.split('\n')[0].match(ShortcutCommand.getShortcutReTitle());
+        let matchFetch = msg.content.match(ShortcutCommand.getShortcutReFetch());
+        let matchShow = msg.content.match(ShortcutCommand.getShortcutReShow());
+        let matchDelete = msg.content.match(ShortcutCommand.getShortcutReDelete());
+
         if(matchSave){
             this.newShortcut(msg, matchSave);
+        } else if (matchFetch) {
+            this.fetchShortcut(msg, matchFetch);
+        } else if (matchShow) {
+            this.showShortcuts(msg, matchShow);
+        } else if (matchDelete) {
+            this.deleteShortcut(msg, matchDelete);
+        } else {
+            this.error(msg, 'Your command did not match the expected format.');
         }
     }
 
@@ -47,6 +71,10 @@ module.exports = class ShortcutCommand extends JSONCommand{
                 this.error(msg, `Row ${i+1} of your command did not match the expected format.`)
             }
         }
+        if(cmds.length >= 10){
+            this.push(responses.reply(msg, 'You cannot create a shortcut with 10 or more commands.'));
+            return;
+        }
         shortcut["Commands"] = cmds;
 
         this.pushEltToArray(
@@ -64,8 +92,46 @@ module.exports = class ShortcutCommand extends JSONCommand{
         this.openShortcut(msg, shortcut);
     }
 
+    fetchShortcut(msg, matchFetch){
+        let shortcut = this.getElt(
+            msg.author,
+            "Shortcuts",
+            elt => {
+                return elt["Name"] == matchFetch[1];
+            }
+        )
+        if(!shortcut) {
+            this.push(responses.reply(msg, 'You do not have any saved shortcuts with that name.'));
+            return;
+        }
+        this.openShortcut(msg, shortcut);
+    }
+
+    showShortcuts(msg, matchShow){
+        this.showArray(
+            msg,
+            "Shortcuts",
+            ["Name"],
+            'You have the following shortcuts:',
+            'You may retrieve any of the above shortcuts with `--shortcut fetch Name`',
+            'You have no shortcuts saved.'
+        )
+    }
+
+    deleteShortcut(msg, matchDelete){
+        this.deleteElt(
+            msg,
+            "Shortcuts",
+            elt => {
+                return elt["Name"] == matchDelete[1];
+            },
+            'Your shortcut has been deleted.',
+            'You have no shortcuts with that name.',
+            'You have no saved shortcuts'
+        );
+    }
+
     openShortcut(msg, shortcut){
-        console.log(shortcut["Commands"]);
         let messageEmbed =  new Discord.MessageEmbed()
             .setColor('#fc80a2')
             .setTitle(shortcut["Name"])
@@ -76,13 +142,19 @@ module.exports = class ShortcutCommand extends JSONCommand{
             .setThumbnail('attachment://writing.png')
 
         let cmds = shortcut["Commands"];
-        for(let cmd of cmds){
+        for(let i in cmds){
             messageEmbed.addField(
-                '`' + cmd["Name"] + '`',
-                cmd["Command"],
+                `\` ${parseInt(i)+1}: ${cmds[i]["Name"]} \``,
+                '⠀' + cmds[i]["Command"],
                 false
             )
         }
+
+        this.sendEmbed(msg, messageEmbed, shortcut);
+    }
+
+    sendEmbed(msg, messageEmbed, shortcut){
+        let cmds = shortcut["Commands"];
 
         this.push(
             responses.message(

@@ -30,6 +30,18 @@ module.exports = class JSONCommand extends Command {
         }
     }
 
+    getElt(user, arrayName, isElt){
+        let array = this.getArray(user, arrayName);
+        let found;
+        for(let elt of array){
+            if(isElt(elt)){
+                found = elt;
+                break;
+            }
+        }
+        return found;
+    }
+
     saveObject(msg, userObject, successText){
         let isErr = jsonHandler.saveObject(
             this.getUserFilePath(msg.author),
@@ -118,14 +130,11 @@ module.exports = class JSONCommand extends Command {
     }
 
     showElt(msg, arrayName, isElt, foundText, notFoundText){
-        let array = this.getArray(msg.author, arrayName);
-        let found;
-        for(let elt of array){
-            if(isElt(elt)){
-                found = elt;
-                break;
-            }
-        }
+        let found = this.getElt(
+            msg.author,
+            arrayName,
+            isElt
+        )
         if(!found){
             this.push(responses.reply(msg, notFoundText || "You do not have an object with that name."));
             return;

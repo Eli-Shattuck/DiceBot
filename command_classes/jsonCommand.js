@@ -121,7 +121,7 @@ module.exports = class JSONCommand extends Command {
         for(let elt of array){
             toWrite += '\n';
             for(let field of eltFields){
-                toWrite += `${field} : "${elt[field]}", `
+                toWrite += `${field}: "${elt[field]}" \t`
             }
             toWrite.substring(0, toWrite.length - 2);
         }

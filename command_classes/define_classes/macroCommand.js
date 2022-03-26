@@ -17,19 +17,30 @@ module.exports = class MacroCommand extends DefineCommand {
     };
     
     handle(msg){
+        let sameName;
         let found;
         for(let macro of this.getMacros(msg.author)){
-            if(
-                MacroCommand.validate(msg.content, macro["Name"]) &&
-                msg.content.split(' ').length - 1 == macro["argc"]
-            ) {
-                found = macro;
-                break;
+            if(MacroCommand.validate(msg.content, macro["Name"])) {
+                sameName = macro;
+                if(msg.content.split(' ').length - 1 == macro["argc"]){
+                    found = macro;
+                    break;
+                }
             }
         }
         if(!found){
-            console.log("A macro has been matched in match but not found in handle.");
-            this.push(responses.reply("There was an unexpected error retrieving your macro."));
+            if(sameName){
+                this.push(responses.reply(
+                    msg,
+                    `You have no saved macros with the name ${sameName["Name"]} that take 
+                    ${msg.content.split(' ').length - 1} arguments.`
+                ));
+            } else {
+                this.push(responses.reply(
+                    msg,
+                    'There was an unexpected error retrieving your macro.'
+                ))
+            }
             return;
         }
 

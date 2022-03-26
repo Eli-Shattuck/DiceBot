@@ -19,7 +19,7 @@ module.exports = class DefineCommand extends JSONCommand {
     }
 
     static getDefineDeleteRE() {
-        return /--define\s+delete\s+(--\S+)/;
+        return /--define\s+delete\s+(--\S+)\s*(\S+)?/;
     }
 
     static getDefineAnchorRE() {
@@ -133,15 +133,24 @@ module.exports = class DefineCommand extends JSONCommand {
     }
 
     deleteMacro(msg, matchDelete){
-        let toDelete = matchDelete[1];
+        let deleteText
+        if(matchDelete[2]){
+            deleteText = `Your macro ${matchDelete[1]} with ${matchDelete[2]} arguments has been deleted.`
+        } else {
+            deleteText = `Your macro ${matchDelete[1]} was successfully deleted.`
+        }
         this.deleteElt(
             msg,
             "Macros",
             elt => {
-                return elt["Name"] == toDelete;
+                if(matchDelete[2]){
+                    return elt["Name"] == matchDelete[1] && matchDelete[2] == elt["argc"];
+                } else {
+                    return elt["Name"] == matchDelete[1];
+                }
             },
-            `Your macro ${toDelete} was successfully deleted.`,
-            `You have no existing macros with the name "${toDelete}".`,
+            deleteText,
+            `You have no existing macros with the name "${matchDelete[1]}".`,
             'You have no existing macros.'
         );
     }

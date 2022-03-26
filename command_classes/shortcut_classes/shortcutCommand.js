@@ -3,7 +3,6 @@ const Discord = require('discord.js');
 const reactionHandler = require('../../io_classes/reactionHandler.js');
 const UIEmojis = require('../../io_classes/uiEmojis.js');
 const responses = require('../../io_classes/responses.js');
-const { message } = require('prompt');
 
 const NUMS = UIEmojis.NUMS;
 
@@ -14,7 +13,7 @@ module.exports = class ShortcutCommand extends JSONCommand{
     }
 
     static getShortcutReTitle(){
-        return /--shortcut\s+new\s+(.+)/;
+        return /--shortcut\s+new\s+"(.+)"\s*(\S+)?/;
     }
 
     static getShortcutReRow(){
@@ -31,6 +30,10 @@ module.exports = class ShortcutCommand extends JSONCommand{
 
     static getShortcutReDelete(){
         return /--shortcut\s+delete\s+(.+)/;
+    }
+
+    static getShortcutReToggleEdit(){
+        return /--shortcut\s+toggle\s+edit\s+(.+)/;
     }
 
     handle(msg){
@@ -70,7 +73,8 @@ module.exports = class ShortcutCommand extends JSONCommand{
                     "Command" : matchLine[2]
                 })
             } else {
-                this.error(msg, `Row ${i+1} of your command did not match the expected format.`)
+                this.error(msg, `Row ${i+1} of your command did not match the expected format.`);
+                return;
             }
         }
         if(cmds.length >= 10){
@@ -78,6 +82,8 @@ module.exports = class ShortcutCommand extends JSONCommand{
             return;
         }
         shortcut["Commands"] = cmds;
+
+        if(matchSave[2] && matchSave[2].toLowerCase() == 'true') shortcut.shouldEdit = true;
 
         this.pushEltToArray(
             msg,
@@ -170,7 +176,7 @@ module.exports = class ShortcutCommand extends JSONCommand{
                         message,
                         (reaction, user) => {
                             let cmdIndex = NUMS.findIndex(elt => elt.id === reaction.emoji.id) - 1;
-                            this.parse(msg, cmds[cmdIndex]["Command"]);
+                            this.parse(msg, cmds[cmdIndex]["Command"], shortcut.shouldEdit);
                             reaction.users.remove(user.id);
                         }
                     );
@@ -179,14 +185,14 @@ module.exports = class ShortcutCommand extends JSONCommand{
         )
     }
 
-    parse(msg, cmdText) {
+    parse(msg, cmdText, shouldEdit) {
         let oldContent = msg.content;
         msg.content = cmdText;
         let Parser = require('../../parser.js');
         let p = new Parser(msg);
 
         let paginator = require('../../io_classes/paginator.js');
-        p.respond = response => {
+        if(shouldEdit) p.respond = response => {
             if(this.sentMessage) {
                 response.isMessage = false;
                 if(response.isReply && !(response.content instanceof Discord.MessageEmbed)){

@@ -169,6 +169,7 @@ function handleString(response) {
 
 module.exports = {
     paginate: (response) => {
+        //console.log(response);
         if(response.content instanceof Discord.MessageEmbed) {
             handleEmbed(response);
         } else if(response.content.constructor.name === "String") {

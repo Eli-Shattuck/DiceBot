@@ -14,12 +14,14 @@ module.exports = class DBMarkdownCommand extends Command{
     
     handle(msg){
         let content = msg.content.substring(this.cmdName.length+1);
-        content = doMarkdown(content);
-        if(content === null) {
-            this.error(msg, "Formatting error")
+        let res = doMarkdown(content);
+        //console.log("res", res);
+        if(!res.sucsess) {
+            this.error(msg, res.msg);
+            return;
         }
-        console.log(content);
-        this.push(responses.message(msg, content));
+        //console.log(res.val);
+        this.push(responses.message(msg, res.val));
         return;
     };
 }

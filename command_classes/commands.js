@@ -17,5 +17,6 @@ module.exports = [
     require('./define_classes/macroCommand.js'),
     require('./roll-shortcut_classes/rollShortcutCommand.js'),
     require('./map_classes/combatMapCommand.js'),
-    require('./shortcut_classes/shortcutCommand.js')
+    require('./shortcut_classes/shortcutCommand.js'),
+    require('./dbMarkdownCommand.js')
 ]

@@ -34,7 +34,14 @@ module.exports = {
 
     addReactions: (emojiObjects, message) => {
         //console.log(emojiIdentifiers);
-        for(let emoji of emojiObjects) message.react(emoji.toString());
+        for(let emoji of emojiObjects){
+            try{
+                message.react(emoji.toString());
+            } catch(e) {
+                console.log("Could not add reaction to a message.");
+                return;
+            }
+        }
     },
 
     removeReactions: (emojiObjects, message) => {

@@ -31,7 +31,7 @@ class Pages {
         let shouldBreak = res.shouldBreak || this.shouldBreak;
         for(let i = 0; i < res.content.length; i++) {
             tmp += res.content[i];
-            if((shouldBreak && shouldBreak(tmp)) || tmp.length >= 1999-'\npage: ### / ###'.length) {
+            if((shouldBreak && shouldBreak(tmp)) || tmp.length >= 1999 - '\npage: ### / ###'.length) {
                 if(tmp[tmp.length-1] != '\n') tmp += '\n';
                 tmp += `\`Page: ${this.pages.length + 1} / `;
                 this.pages.push(tmp);
@@ -42,8 +42,8 @@ class Pages {
             if(tmp[tmp.length-1] != '\n') tmp += '\n';
             if(this.pages.length >= 1) tmp += `\`Page: ${this.pages.length + 1} / `;
             this.pages.push(tmp);
-        } else {
-            console.log("WTF???");
+        } else if(this.pages.length < 1) { //shouldBreak was true on last character of the message or the message was empty
+            console.log("The message was empty.");
         }
 
         if(this.pages.length > 1){

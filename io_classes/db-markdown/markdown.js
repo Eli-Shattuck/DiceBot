@@ -1,5 +1,47 @@
 const style = require('./styleString.js');
 
+const styleStringToBitMaskMap = {
+    'serif': 0b00000001,
+    'sans' : 0b00000010,
+    'bf'   : 0b00000100,
+    'it'   : 0b00001000,
+    'cal'  : 0b00010000,
+    'frak' : 0b00100000,
+    'mono' : 0b01000000,
+    'bb'   : 0b10000000 
+};
+
+const bitMaskToStyleStringMap = {
+    0b00000001 : 'serif',
+    0b00000010 : 'sans' ,
+    0b00000100 : 'bf'   ,
+    0b00001000 : 'it'   ,
+    0b00010000 : 'cal'  ,
+    0b00100000 : 'frak' ,
+    0b01000000 : 'mono' ,
+    0b10000000 : 'bb'    
+}
+
+const styleStrings = {
+    0b00000010: 'sans-serif normal',
+    0b00000001: 'serif normal',
+    0b00000110: 'sans-serif bold',
+    0b00000101: 'serif bold',
+    0b00001010: 'sans-serif italic',
+    0b00001001: 'serif italic',
+    0b00001110: 'sans-serif bold italic',
+    0b00001101: 'serif bold italic',
+    0b00010000: 'cal normal',
+    0b00010100: 'cal bold',
+    0b00100000: 'fraktur normal',
+    0b00100100: 'fraktur bold',
+    0b01000000: 'mono',
+    0b10000000: 'bb',
+}
+
+function setBit(pattern, bitToSet) { return pattern | bitToSet };
+function testBit(pattern, bitToSet) { return (pattern & bitToSet) === 0 ? 0 : 1 };
+
 const ESCAPED = "'\"nt\\{}";
 const ESCAPED_AFTER = "'\"\n\t\\{}";
 class TextParser {
@@ -10,26 +52,30 @@ class TextParser {
     }
 
     parse(stop) {
-        stop = stop || '';
+        let stopChar = stop || '';
         let parsed = '';
-        while(this.hasNext() && stop.indexOf(this.peek()) < 0) {
+        while(this.hasNext() && stopChar.indexOf(this.peek()) < 0) {
             let curr = this.pop();
             if(curr === '\\') {
-                console.log('backslash', curr, this.peek());
+                //console.log('backslash', curr, this.peek());
                 if(this.checkEscape()) {
-                    console.log('escape');
+                    //console.log('escape');
                     let res = this.getEscape();
                     if(!res.sucsess) return res;
                     parsed += res.val; 
                 } else {
-                    console.log('style');
-                    let res = this.getStyleMacro();
+                    //console.log('style');
+                    let res = this.getStyleMacro(0);
                     if(!res.sucsess) return res;
                     parsed += res.val;
                 }
             } else {
                 parsed += curr;
             }
+        }
+        console.log(this.hasNext(), stopChar.indexOf(this.peek()) < 0, this.peek());
+        if(stop && (!this.hasNext() || !stopChar.indexOf(this.peek()) < 0)) { //if we were supposed to hit a stop char and didnt
+            return {sucsess: false, val: null, msg: `Expexted ['${stop.split('').join("', '")}']`}
         }
         return { sucsess: true, val: parsed };
     }
@@ -51,11 +97,22 @@ class TextParser {
         return this.index < this.text.length;
     }
 
-    getStyleMacro() {
+    getStyleFromBitSet(currStyleBitSet, inStyleSting) {
+        let mask = styleStringToBitMaskMap[inStyleSting];
+        if(!mask) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] is unrecognized.`};
+        let newStyleBitSet = setBit(currStyleBitSet, mask);
+        let outStyleString = styleStrings[newStyleBitSet];
+        if(outStyleString == undefined) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] cannot be set with [${bitMaskToStyleStringMap[mask]}].`};
+        return outStyleString;
+    }
+
+    getStyleMacro(currStyle) {
         let macro = {};
         let res = this.parse('{'); //TODO: check brackets better
         if(!res.sucsess) return res;
-        macro.style = res.val;
+        res = this.getStyleFromBitSet(currStyle, res.val);
+        if(!res.sucsess) return res;
+        macro.style = res;
         this.next();
         
         res = this.parse('}');

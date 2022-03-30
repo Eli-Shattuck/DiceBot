@@ -9,7 +9,7 @@ module.exports = class SayCommand extends Command{
 
     match(msg){
         //console.log(msg.content.toLowerCase());
-        return msg.content.toLowerCase().indexOf(this.cmdName) === 0;
+        return msg.content.toLowerCase().indexOf(this.cmdName + ' ') === 0;
     };
     
     handle(msg){

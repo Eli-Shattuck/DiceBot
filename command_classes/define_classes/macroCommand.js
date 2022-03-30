@@ -1,6 +1,8 @@
 const DefineCommand = require('./defineCommand.js');
 const responses = require('../../io_classes/responses.js');
 const client = require('../../clientSource.js');
+const reactionHandler = require('../../io_classes/reactionHandler.js');
+const UIEmojis = require('../../io_classes/uiEmojis.js');
 
 module.exports = class MacroCommand extends DefineCommand {
     constructor(onNewResponse){
@@ -52,7 +54,10 @@ module.exports = class MacroCommand extends DefineCommand {
         args = args.splice(1, args.length) // only keep args
         try{
             f(args, {
-                parse: (str, anchor) => { this.parseAnchor(str, msg, anchor); },
+                parse : (str, anchor) => { this.parseAnchor(str, msg, anchor); },
+                msg,
+                reactionHandler,
+                UIEmojis
             });
         } catch (e) {
             this.push(responses.message(msg, `JS runtime error: [${e}]`));

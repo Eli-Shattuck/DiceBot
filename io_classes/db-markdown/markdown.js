@@ -20,18 +20,18 @@ class TextParser {
                     console.log('escape');
                     let res = this.getEscape();
                     if(!res.sucsess) return res;
-                    parsed += ; 
+                    parsed += res.val; 
                 } else {
                     console.log('style');
-                    let styled = this.getStyleMacro();
-                    if(styled === null) return null;
-                    parsed += styled;
+                    let res = this.getStyleMacro();
+                    if(!res.sucsess) return res;
+                    parsed += res.val;
                 }
             } else {
                 parsed += curr;
             }
         }
-        return parsed;
+        return { sucsess: true, val: parsed };
     }
 
     peek() {
@@ -53,14 +53,21 @@ class TextParser {
 
     getStyleMacro() {
         let macro = {};
-        macro.style = this.parse('{');
-        if(macro.style === null) return {sucsess: false, val: null};
+        let res = this.parse('{'); //TODO: check brackets better
+        if(!res.sucsess) return res;
+        macro.style = res.val;
         this.next();
-        macro.str = this.parse('}');
-        if(macro.str === null) return {sucsess: false, val: null};
+        
+        res = this.parse('}');
+        if(!res.sucsess) return res;
+        macro.str = res.val;
         this.next();
+
         let styled = style(macro);
-        return {sucsess: styled !== null, val: style};
+        if(styled === null) {
+            return {sucsess: false, val:null, msg:`Style: [${macro.style}] is unrecognized.`}
+        }
+        return {sucsess: true, val: styled};
     }
 
     getEscape() {

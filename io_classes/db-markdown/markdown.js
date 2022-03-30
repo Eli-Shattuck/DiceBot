@@ -25,12 +25,16 @@ const bitMaskToStyleStringMap = {
 const styleStrings = {
     0b00000010: 'sans-serif normal',
     0b00000001: 'serif normal',
+    0b00000000: 'serif normal',
     0b00000110: 'sans-serif bold',
     0b00000101: 'serif bold',
+    0b00000100: 'serif bold',
     0b00001010: 'sans-serif italic',
     0b00001001: 'serif italic',
+    0b00001000: 'serif italic',
     0b00001110: 'sans-serif bold italic',
     0b00001101: 'serif bold italic',
+    0b00001100: 'serif bold italic',
     0b00010000: 'cal normal',
     0b00010100: 'cal bold',
     0b00100000: 'fraktur normal',
@@ -51,7 +55,7 @@ class TextParser {
         else this.index = index;
     }
 
-    parse(stop) {
+    parse(stop, currStyle) {
         let stopChar = stop || '';
         let parsed = '';
         while(this.hasNext() && stopChar.indexOf(this.peek()) < 0) {
@@ -65,7 +69,7 @@ class TextParser {
                     parsed += res.val; 
                 } else {
                     //console.log('style');
-                    let res = this.getStyleMacro(0);
+                    let res = this.getStyleMacro(currStyle === undefined ? 0 : currStyle);
                     if(!res.sucsess) return res;
                     parsed += res.val;
                 }
@@ -97,25 +101,37 @@ class TextParser {
         return this.index < this.text.length;
     }
 
-    getStyleFromBitSet(currStyleBitSet, inStyleSting) {
+    getStyleBitSet(currStyleBitSet, inStyleSting) {
         let mask = styleStringToBitMaskMap[inStyleSting];
         if(!mask) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] is unrecognized.`};
         let newStyleBitSet = setBit(currStyleBitSet, mask);
+        return {sucsess: true, val: newStyleBitSet};
+    }
+
+    getStyleFromBitSet(inStyleSting, newStyleBitSet) {
         let outStyleString = styleStrings[newStyleBitSet];
-        if(outStyleString == undefined) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] cannot be set with [${bitMaskToStyleStringMap[mask]}].`};
-        return outStyleString;
+        if(outStyleString == undefined) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] cannot be set with [${newStyleBitSet.toString(2)}].`};
+        console.log(outStyleString);
+        return {sucsess: true, val: outStyleString};
     }
 
     getStyleMacro(currStyle) {
         let macro = {};
-        let res = this.parse('{'); //TODO: check brackets better
+        let res = this.parse('{', currStyle); //TODO: check brackets better
         if(!res.sucsess) return res;
-        res = this.getStyleFromBitSet(currStyle, res.val);
+        let newStyleStr = res.val;
+
+        res = this.getStyleBitSet(currStyle, newStyleStr);
         if(!res.sucsess) return res;
-        macro.style = res;
+        let newBitSet = res.val;
+
+        res = this.getStyleFromBitSet(newStyleStr, newBitSet);
+        if(!res.sucsess) return res;
+        
+        macro.style = res.val;
         this.next();
         
-        res = this.parse('}');
+        res = this.parse('}', newBitSet);
         if(!res.sucsess) return res;
         macro.str = res.val;
         this.next();

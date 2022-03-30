@@ -11,27 +11,27 @@ module.exports = class DefineCommand extends JSONCommand {
     }
     
     static getDefineShowMacrosRE() {
-        return /--define\s+show\s+macros/;
+        return /--define\s*-show-macros/;
     }
 
     static getDefineInspectRE() {
-        return /--define\s+inspect\s+(--\S+)\s*/;
+        return /--define\s*-inspect\s+(--\S+)\s*/;
     }
 
     static getDefineDeleteRE() {
-        return /--define\s+delete\s+(--\S+)\s*(\S+)?/;
+        return /--define\s*-delete\s+(--\S+)\s*(\S+)?/;
     }
 
     static getDefineAnchorRE() {
-        return /--define\s+anchor\s+(\S+)/;
+        return /--define\s*-anchor\s+(\S+)/;
     }
 
     static getDefineShowAnchorsRE() {
-        return /--define\s+show\s+anchors/;
+        return /--define\s*-show-anchors/;
     }
 
     static getDefineDeleteAnchorRE() {
-        return /--define\s+deleteanchor\s+(\S+)/;
+        return /--define\s*-delete-anchor\s+(\S+)/;
     }
     
     handle(msg){
@@ -120,7 +120,7 @@ module.exports = class DefineCommand extends JSONCommand {
             "Macros",
             ["Name", "argc"],
             "You have the following macros:",
-            "You can inspect any of these macros using `--define inspect macroName`, or delete it with `--define delete macroName`.",
+            "You can inspect any of these macros using `--define -inspect macroName`, or delete it with `--define -delete macroName`.",
             "You have no saved macros."
         );
     }
@@ -137,7 +137,7 @@ module.exports = class DefineCommand extends JSONCommand {
                 } 
             },
             "This macro has the following properties:",
-            "You do not have a macro with that name. Try `--define show macros` to see your macros."
+            "You do not have a macro with that name. Try `--define -show-macros` to see your macros."
         );
     }
 
@@ -190,7 +190,7 @@ module.exports = class DefineCommand extends JSONCommand {
             "Anchors",
             ["Name", "Channel Name", "Server Name"],
             "You have the following anchors:",
-            "You can delete an anchor by using `--define delete anchor anchorName`",
+            "You can delete an anchor by using `--define -delete-anchor anchorName`",
             "You have no saved anchors."
         );
     }

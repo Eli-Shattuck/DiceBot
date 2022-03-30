@@ -1,5 +1,5 @@
 const JSONCommand = require('../jsonCommand.js');
-const UIEmojis = require('../../io_classes/uiEmojis.js');
+const responses = require('../../io_classes/responses.js');
 
 module.exports = class DefineCommand extends JSONCommand {
     constructor(onNewResponse){
@@ -77,6 +77,15 @@ module.exports = class DefineCommand extends JSONCommand {
 
     defineNew(msg, matchDefine){
         let macroName = matchDefine[1];
+        let Commands = require('../commands');
+        for(let Cmd of Commands){
+            let cmd = new Cmd;
+            if(cmd.cmdName == macroName){
+                this.push(responses.reply(msg, `You cannot create the macro "${macroName}" because it has the same name as an existing command.`));
+                return;
+            }
+        }
+
         let argc = matchDefine[2] ? matchDefine[2] : 0;
         argc = parseInt(argc);
 

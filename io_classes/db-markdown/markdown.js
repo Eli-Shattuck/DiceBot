@@ -45,9 +45,20 @@ const styleStrings = {
 
 function setBit(pattern, bitToSet) { return pattern | bitToSet };
 function testBit(pattern, bitToSet) { return (pattern & bitToSet) === 0 ? 0 : 1 };
+function stringSet(pattern) {
+    let out = ''
 
-const ESCAPED = "'\"nt\\{}";
-const ESCAPED_AFTER = "'\"\n\t\\{}";
+    for (let key in bitMaskToStyleStringMap) {
+        if(testBit(pattern, key)) {
+            out += bitMaskToStyleStringMap[key] + ', ';
+        }
+    }
+
+    return out.substring(0, out.length-2);
+}
+
+const ESCAPED = ["'", '"', 'n', 't', '\\', '{', '}', '*', '~', '|'];
+const ESCAPED_AFTER = ["'", '"', '\n', '\t', '\\', '{', '}', '\\*', '\\~', '\\|'];
 class TextParser {
     constructor(text, index) {
         this.text = text;
@@ -108,16 +119,16 @@ class TextParser {
         return {sucsess: true, val: newStyleBitSet};
     }
 
-    getStyleFromBitSet(inStyleSting, newStyleBitSet) {
+    getStyleFromBitSet(inStyleSting, newStyleBitSet, oldBitSet) {
         let outStyleString = styleStrings[newStyleBitSet];
-        if(outStyleString == undefined) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] cannot be set with [${newStyleBitSet.toString(2)}].`};
+        if(outStyleString == undefined) return {sucsess: false, val:null, msg:`Style: [${inStyleSting}] cannot be set with [${stringSet(oldBitSet)}].`};
         console.log(outStyleString);
         return {sucsess: true, val: outStyleString};
     }
 
     getStyleMacro(currStyle) {
         let macro = {};
-        let res = this.parse('{', currStyle); //TODO: check brackets better
+        let res = this.parse('{', currStyle);
         if(!res.sucsess) return res;
         let newStyleStr = res.val;
 
@@ -125,7 +136,7 @@ class TextParser {
         if(!res.sucsess) return res;
         let newBitSet = res.val;
 
-        res = this.getStyleFromBitSet(newStyleStr, newBitSet);
+        res = this.getStyleFromBitSet(newStyleStr, newBitSet, currStyle);
         if(!res.sucsess) return res;
         
         macro.style = res.val;

@@ -30,7 +30,6 @@ class CTimer{
 }
 
 
-
 module.exports = class CombatTimerCommand extends Command{
     constructor(onNewResponse){
         super(onNewResponse, '--combat-timer');

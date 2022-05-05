@@ -1,5 +1,5 @@
 const Command = require('../command.js');
-const PDFDocument = require('pdfkit');
+const PDFDocument = require('pdf-lib').PDFDocument;
 const fs = require('fs');
 const https = require('https');
 const responses = require('../../io_classes/responses.js');
@@ -8,6 +8,32 @@ const reactionHandler = require('../../io_classes/reactionHandler.js');
 
 const YES = UIEmojis.YES;
 const STOP = UIEmojis.STOP;
+
+//console.log(PDFDocument);
+
+//const existingPdfBytes = fs.readFileSync(`./command_classes/save_classes/save_data/Alena.pdf`);
+//
+//// Load a PDFDocument without updating its existing metadata
+//const pdfDoc = PDFDocument.load(existingPdfBytes, {
+//  updateMetadata: false
+//});
+
+//console.log(pdfDoc);
+//console.log(pdfDoc.then(pdf => {
+//    let form = pdf.getForm();
+//    let fields = form.getFields();
+//    //for(let i in fields){
+//    //    console.log(`Field ${i}:`, fields[i].getName());   
+//    //}
+//    console.log(form.getTextField('STR').getText());
+//    form.getTextField('STR').setText('20');
+//
+//    pdf.save().then(data => {
+//        fs.writeFileSync(`./command_classes/save_classes/save_data/Alena.pdf`, data);
+//    });
+//
+//    console.log('done');
+//}));
 
 
 module.exports = class SaveCommand extends Command{
@@ -20,6 +46,10 @@ module.exports = class SaveCommand extends Command{
     }
 
     handle(msg){
+        this.saveAttatchments(msg);
+    }
+
+    saveAttatchments(msg){
         let attachments = msg.attachments
         for(let [id, a] of attachments){
             if(fs.existsSync(this.getFilePath(a.name))){
@@ -54,7 +84,7 @@ module.exports = class SaveCommand extends Command{
                     )
                 );
             } else {
-                this.saveFile(mag, a);
+                this.saveFile(msg, a);
             }
         }
     }

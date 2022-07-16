@@ -4,7 +4,7 @@ const responses = require('../io_classes/responses.js');
 
 const aliesLen = '--roll 0123'.length;
 const alieses = {
-    '--roll char' : '--roll 4d6 -pick 3 -loop 6 -sum',
+    '--roll char' : '--roll 4d6 -sort -pick 3 -loop 6 -sum',
     '--roll stat' : '--roll 4d6 -pick 3 -sum',
     '--roll nice' : '--roll 69d69 -sort -pick 1',
     '--roll bazz' : '--roll 1d20 -bazz',
@@ -83,8 +83,6 @@ const disallowedFlagPairs = new Map([
     ['-sum' ,  new Set([
         '-dis',
         '-adv',
-        '-sort',
-        '-isort',
         '-sum',
     ])],
     ['-loop' ,  new Set([
@@ -117,7 +115,6 @@ module.exports = class RollCommand extends Command{
         if(args == undefined) return;
 
         let [n, x, b, options] = args;
-        //console.log(n, x, b, options);
         
         let loop;
         let loopSize = 1;
@@ -144,15 +141,6 @@ module.exports = class RollCommand extends Command{
             let extra = this.doOptions(results, n, x, b, options);
             this.sendResults(msg, results, extra, bazz);
         }
-
-        //TODO: Include batch printing
-        // let reply = msg.author.username + ' is rolling...';
-        // let batches = new BatchList();
-
-        // batches.push(message + '\n');
-        // for(let i=0; i<results.length; i++){
-            
-        // }
     }
 
     sendResults(msg, results, extraLines, bazz){
@@ -171,7 +159,7 @@ module.exports = class RollCommand extends Command{
                         )
                 )
             }
-        } else {
+        } else if(results.length > 0){
             let toSend = "";
             for(let res of results) {
                 toSend += res + "\n";
@@ -190,8 +178,8 @@ module.exports = class RollCommand extends Command{
         }
         if(extraLines) {
             let toSend = '';
-            for(let line of extraLines) {
-                toSend += line + "\n";
+            for(let line of extraLines){
+                toSend += line + '\n';
             }
             this.push(
                 responses.message(msg, toSend)
@@ -217,41 +205,13 @@ module.exports = class RollCommand extends Command{
             }
             if(buckets[res] > maxLen) maxLen = buckets[res];
         }
-        // const maxBuckets = 20;
-        // let labels = [];
-        // if(Object.keys(buckets).length > maxBuckets) {
-        //     //console.log('> 20');
-        //     min = 1;
-        //     max = 20;
-        //     let newBuckets = [];
-        //     for(let i = b+1; i < x+b; i++) {
-        //         let value = buckets[i] || 0;
-        //         let newBucket = Math.ceil(maxBuckets*i/x);
-        //         console.table(newBuckets);
-        //         if(newBuckets[newBucket]) {
-        //             newBuckets[newBucket]+= value;
-        //             labels[newBucket].push(i);
-        //         } else {
-        //             newBuckets[newBucket] = value;
-        //             labels[newBucket] = [i];
-        //         }
-        //         if(newBuckets[newBucket] > maxLen) maxLen = newBuckets[newBucket];
-        //     }
-        //     buckets = newBuckets;
-        // }
-        //console.table(labels);
+        
         let histParts = [];
         let maxLabel = -Infinity;
         for(let i = min; i <= max; i++) {
             let len = buckets[i] || 0;
             len = Math.floor(barSize * len / maxLen);
             
-            // let label = `[${labels[i][0]}`;
-            // if(labels[i].length > 1) {
-            //     label += `-${labels[i][labels[i].length-1]}`;
-            // }
-            // //label += `-${labels[i][(labels[i].length-1) % labels[i].length]}]`;
-            // label += ']';
 
             let label = '' + i;
 
@@ -294,7 +254,11 @@ module.exports = class RollCommand extends Command{
             if(options.find( elt => elt.name==='-isort' )) results.sort((x, y) => x-y);
 
             const pick = options.find( elt => elt.name==='-pick' );
-            if(pick) results.splice(parseInt(pick.args[0]), results.length);
+            if(pick){
+                console.log(results);
+                results.splice(parseInt(pick.args[0]), results.length);
+                console.log(results);
+            };
 
             // if(options.find( elt => elt.name==='-adv' )){
             //     let max = Math.max(...results);

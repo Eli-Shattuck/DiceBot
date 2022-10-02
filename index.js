@@ -3,7 +3,7 @@ const Parser = require('./parser.js');
 const reactionHandler = require('./io_classes/reactionHandler.js');
 const client = require('./clientSource.js');
 
-//hello
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 })

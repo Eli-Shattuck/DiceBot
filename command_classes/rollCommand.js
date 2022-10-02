@@ -321,8 +321,8 @@ module.exports = class RollCommand extends Command{
             }
 
             if(matchRoll[3]) {
-                b = parseInt(matchRoll[3]);
-                if(n == NaN) {
+                b = parseInt(matchRoll[3].replace(/\s/g, "")); //there can be whitespace inside the capture group
+                if(b == NaN) {
                     this.error(msg, `Invalid argument for b: "${matchRoll[3]}".`);
                     return;
                 }
